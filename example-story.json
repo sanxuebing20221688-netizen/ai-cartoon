@@ -1,0 +1,85 @@
+[
+  {
+    "panel": "💕",
+    "dialogues": [
+      {
+        "speaker": "旁白",
+        "text": "樱花飘落的校园小道上，你看到了一个熟悉的背影..."
+      }
+    ],
+    "choices": [
+      {
+        "text": "🌹 上前搭讪",
+        "next": 1
+      },
+      {
+        "text": "👀 悄悄观察",
+        "next": 2
+      }
+    ]
+  },
+  {
+    "panel": "🌸",
+    "dialogues": [
+      {
+        "speaker": "你",
+        "text": "那个...请问你知道图书馆怎么走吗？"
+      },
+      {
+        "speaker": "她",
+        "text": "哦，前面左转就是了。"
+      }
+    ],
+    "choices": [
+      {
+        "text": "💬 继续聊天",
+        "next": 3
+      },
+      {
+        "text": "😊 道谢离开",
+        "next": 4
+      }
+    ]
+  },
+  {
+    "panel": "✨",
+    "dialogues": [
+      {
+        "speaker": "旁白",
+        "text": "你默默地看着她远去的背影..."
+      }
+    ],
+    "choices": [
+      {
+        "text": "💕 上前追去",
+        "next": 3
+      }
+    ]
+  },
+  {
+    "panel": "💕",
+    "dialogues": [
+      {
+        "speaker": "她",
+        "text": "其实...我也在找那本书。"
+      },
+      {
+        "speaker": "你",
+        "text": "真的吗？那我们一起去吧！"
+      }
+    ],
+    "choices": [],
+    "ending": "浪漫结局"
+  },
+  {
+    "panel": "😊",
+    "dialogues": [
+      {
+        "speaker": "旁白",
+        "text": "你礼貌地道谢后离开了，虽然没有深入交流，但相遇本身就是美好..."
+      }
+    ],
+    "choices": [],
+    "ending": "温馨结局"
+  }
+]

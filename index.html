@@ -107,6 +107,98 @@
         .character-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 10px; }
         .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #8B5CF6, #EC4899); border: none; border-radius: 8px; color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .btn-primary:hover { transform: scale(1.02); }
+        /* 文件上传 */
+        .file-upload-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.02);
+        }
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .upload-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #94A3B8;
+            margin-top: 5px;
+        }
+        .file-preview {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .file-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .file-item-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .file-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .file-item-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-item-size {
+            font-size: 0.8rem;
+            color: #94A3B8;
+        }
+        .file-item-remove {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .file-item-remove:hover {
+            background: #EF4444;
+        }
+        .file-image-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
         /* 阅读页面 */
         .read-container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .comic-panel { background: var(--bg-card); border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
@@ -246,10 +338,130 @@
         </div>
     </div>
 
-    <div id="create" class="page"></div>
-    <div id="read" class="page"></div>
-    <div id="browse" class="page"></div>
-    <div id="profile" class="page"></div>
+    <div id="create" class="page">
+        <div class="container">
+            <div class="create-container">
+                <div class="create-section">
+                    <h3>📝 故事类型</h3>
+                    <div class="form-group">
+                        <label>选择故事类型</label>
+                        <select id="storyGenre">
+                            <option value="">请选择...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="create-section">
+                    <h3>🎨 角色设定</h3>
+                    <div class="form-group">
+                        <label>角色名称</label>
+                        <input type="text" id="characterName" placeholder="给你的角色起个名字">
+                    </div>
+                    <div class="form-group">
+                        <label>角色性格</label>
+                        <div class="personality-tags">
+                            <div class="personality-tag" onclick="togglePersonality(this)">勇敢</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">温柔</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">聪明</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">幽默</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">冷静</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">善良</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">叛逆</div>
+                            <div class="personality-tag" onclick="togglePersonality(this)">神秘</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="create-section">
+                    <h3>📁 文件导入</h3>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div class="upload-placeholder">
+                            <div class="upload-icon">📤</div>
+                            <p>拖拽文件到此处或点击上传</p>
+                            <p class="upload-hint">支持图片（PNG/JPG）、文本（TXT）、JSON、Markdown</p>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".png,.jpg,.jpeg,.txt,.json,.md" style="display: none;">
+                    </div>
+                    <div id="filePreview" class="file-preview"></div>
+                </div>
+
+                <div class="create-section">
+                    <h3>👤 角色预览</h3>
+                    <div class="character-preview">
+                        <div class="character-avatar" id="previewAvatar">?</div>
+                        <div class="character-name" id="previewName">待命名</div>
+                        <div class="character-traits" id="previewTraits">尚未设定性格</div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="generateStory()">✨ 开始创作</button>
+            </div>
+        </div>
+    </div>
+    <div id="read" class="page">
+        <div class="read-container">
+            <div class="comic-panel">
+                <div class="panel-image" id="panelImage">🎬</div>
+                <div class="panel-content">
+                    <div id="storyContent"></div>
+                </div>
+            </div>
+            <div class="choice-container" id="choiceContainer" style="display: none;">
+                <h4>你的选择：</h4>
+                <div id="choices"></div>
+            </div>
+        </div>
+    </div>
+    <div id="browse" class="page">
+        <div class="container">
+            <div class="section">
+                <h2>📚 浏览故事</h2>
+                <div class="browse-filters" id="browseFilters">
+                    <button class="filter-btn active" onclick="filterByGenre('all')">全部</button>
+                </div>
+                <div class="comic-list" id="comicList"></div>
+            </div>
+        </div>
+    </div>
+    <div id="profile" class="page">
+        <div class="container">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">?</div>
+                <div class="profile-name" id="profileName">未登录</div>
+                <div class="profile-title">点击上方登录按钮开始体验</div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statCreated">0</div>
+                        <div class="stat-label">创作</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statRead">0</div>
+                        <div class="stat-label">阅读</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statEndings">0</div>
+                        <div class="stat-label">结局</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>💰 我的积分</h3>
+                <div class="stat-value" id="myPoints">0</div>
+            </div>
+            <div class="section">
+                <h3>❤️ 我的收藏</h3>
+                <div class="featured-grid" id="myFavorites"></div>
+            </div>
+            <div class="section">
+                <h3>🏆 我的成就</h3>
+                <div class="achievements" id="myAchievements"></div>
+            </div>
+            <div class="section">
+                <h3>📚 我的作品</h3>
+                <div class="featured-grid" id="myWorks"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ========== 配置 ==========
@@ -262,6 +474,7 @@
         // ========== 全局数据 ==========
         let currentUser = null;
         let currentCharacter = {}, storyProgress = {};
+        let uploadedFiles = []; // 存储上传的文件
 
         // 37个故事数据
         const allStories = [
@@ -544,6 +757,232 @@
             if (select) {
                 select.innerHTML = allStories.filter(s => s.genre === s.genre).map(g => `<option value="${g.genre}">${g.icon} ${g.genre}</option>`).join('');
             }
+            initFileUpload();
+        }
+
+        // ========== 文件上传系统 ==========
+        function initFileUpload() {
+            const uploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            // 点击上传
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            // 拖拽上传
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            // 文件选择
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                fileInput.value = ''; // 重置，允许重复选择同一文件
+            });
+        }
+
+        function handleFiles(files) {
+            const maxSize = 5 * 1024 * 1024; // 5MB限制
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'text/plain', 'application/json', 'text/markdown'];
+
+            for (let file of files) {
+                // 检查文件大小
+                if (file.size > maxSize) {
+                    alert(`文件 "${file.name}" 超过5MB限制`);
+                    continue;
+                }
+
+                // 检查文件类型
+                if (!allowedTypes.includes(file.type) && !file.name.endsWith('.md')) {
+                    alert(`不支持的文件类型: ${file.name}`);
+                    continue;
+                }
+
+                // 检查重复
+                if (uploadedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                    alert(`文件 "${file.name}" 已存在`);
+                    continue;
+                }
+
+                // 读取文件
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileData = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        content: e.target.result,
+                        preview: null
+                    };
+
+                    // 如果是图片，创建预览
+                    if (file.type.startsWith('image/')) {
+                        fileData.preview = e.target.result;
+                    }
+
+                    uploadedFiles.push(fileData);
+                    renderFilePreview();
+                };
+
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            }
+        }
+
+        function renderFilePreview() {
+            const container = document.getElementById('filePreview');
+            if (uploadedFiles.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = uploadedFiles.map((file, index) => {
+                const icon = getFileIcon(file.type);
+                const preview = file.preview 
+                    ? `<img src="${file.preview}" class="file-image-preview" alt="${file.name}">`
+                    : `<div class="file-item-icon">${icon}</div>`;
+
+                return `
+                    <div class="file-item">
+                        ${preview}
+                        <div class="file-item-info">
+                            <div class="file-item-name">${file.name}</div>
+                            <div class="file-item-size">${formatFileSize(file.size)}</div>
+                        </div>
+                        <button class="file-item-remove" onclick="removeFile(${index})">×</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            renderFilePreview();
+        }
+
+        function getFileIcon(type) {
+            if (type.startsWith('image/')) return '🖼️';
+            if (type === 'application/json') return '📋';
+            if (type === 'text/plain') return '📄';
+            if (type === 'text/markdown' || type.endsWith('.md')) return '📝';
+            return '📁';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function togglePersonality(element) {
+            element.classList.toggle('selected');
+            updateCharacterPreview();
+        }
+
+        function updateCharacterPreview() {
+            const name = document.getElementById('characterName').value || '待命名';
+            const selectedTraits = document.querySelectorAll('.personality-tag.selected');
+            const traits = selectedTraits.length > 0 
+                ? Array.from(selectedTraits).map(t => t.textContent).join('、')
+                : '尚未设定性格';
+            const genre = document.getElementById('storyGenre').value;
+            
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewTraits').textContent = traits;
+            document.getElementById('previewAvatar').textContent = genre ? getGenreIcon(genre) : '?';
+        }
+
+        function getGenreIcon(genre) {
+            const genreMap = {
+                '恋爱': '💕', '悬疑': '🔍', '玄幻': '🐉', '科幻': '🚀',
+                '恐怖': '👻', '武侠': '⚔️', '搞笑': '😂', '霸宠': '👑', '穿越': '🌀'
+            };
+            return genreMap[genre] || '?';
+        }
+
+        function generateStory() {
+            const genre = document.getElementById('storyGenre').value;
+            const name = document.getElementById('characterName').value;
+            const selectedTraits = document.querySelectorAll('.personality-tag.selected');
+
+            if (!genre) {
+                alert('请选择故事类型！');
+                return;
+            }
+
+            if (uploadedFiles.length > 0) {
+                // 如果有上传文件，使用文件内容
+                processUploadedFiles(genre, name, selectedTraits);
+            } else {
+                // 没有文件，使用默认生成
+                const genreStories = allStories.filter(s => s.genre === genre);
+                if (genreStories.length > 0) {
+                    const story = genreStories[Math.floor(Math.random() * genreStories.length)];
+                    readComic(story.id);
+                } else {
+                    readComic('romance1');
+                }
+            }
+        }
+
+        function processUploadedFiles(genre, name, selectedTraits) {
+            // 创建自定义故事ID
+            const customStoryId = 'custom_' + Date.now();
+            
+            // 从文件中提取内容
+            let storyTitle = name || '自定义故事';
+            let storyIcon = getGenreIcon(genre);
+            
+            // 检查是否有JSON文件（用于自定义剧情）
+            const jsonFile = uploadedFiles.find(f => f.type === 'application/json');
+            if (jsonFile) {
+                try {
+                    const customScenes = JSON.parse(jsonFile.content);
+                    if (customScenes && Array.isArray(customScenes)) {
+                        // 使用自定义剧情
+                        storyScenesCache[customStoryId] = customScenes;
+                    }
+                } catch (e) {
+                    alert('JSON文件格式错误，将使用默认生成');
+                }
+            }
+
+            // 检查是否有文本文件（用于故事描述）
+            const textFile = uploadedFiles.find(f => f.type === 'text/plain' || f.name.endsWith('.txt'));
+            if (textFile) {
+                storyTitle = textFile.name.replace('.txt', '');
+            }
+
+            // 临时添加到故事列表
+            const customStory = {
+                id: customStoryId,
+                title: storyTitle,
+                genre: genre,
+                icon: storyIcon,
+                rating: 4.5,
+                readers: '0',
+                author: currentUser ? currentUser.nickname : '你',
+                chapters: 3,
+                isCustom: true
+            };
+            
+            allStories.push(customStory);
+            
+            // 跳转到阅读
+            readComic(customStoryId);
         }
 
         // ========== 故事阅读 ==========
@@ -749,10 +1188,21 @@
 
         // ========== 初始化 ==========
         document.addEventListener('DOMContentLoaded', () => {
-            renderGenres(); 
-            renderFeatures(); 
-            renderHomeFeatured(); 
+            renderGenres();
+            renderFeatures();
+            renderHomeFeatured();
             loadUser();
+            
+            // 监听输入变化，实时更新预览
+            const characterNameInput = document.getElementById('characterName');
+            const genreSelect = document.getElementById('storyGenre');
+            
+            if (characterNameInput) {
+                characterNameInput.addEventListener('input', updateCharacterPreview);
+            }
+            if (genreSelect) {
+                genreSelect.addEventListener('change', updateCharacterPreview);
+            }
         });
     </script>
 </body>
