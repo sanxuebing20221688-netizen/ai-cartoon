@@ -244,6 +244,9 @@
         .choice-btn:hover { background: rgba(139, 92, 246, 0.3); border-color: var(--primary); }
         /* 浏览页面 */
         .browse-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-bar { margin-bottom: 20px; }
+        .search-bar input { width: 100%; padding: 14px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-size: 1rem; }
+        .search-bar input:focus { outline: none; border-color: var(--secondary); }
         .filter-btn { padding: 8px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: #94A3B8; cursor: pointer; transition: all 0.3s; }
         .filter-btn:hover, .filter-btn.active { background: rgba(139, 92, 246, 0.3); border-color: var(--primary); color: white; }
         .comic-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
@@ -640,6 +643,10 @@
         <div class="container">
             <div class="section">
                 <h2>📚 浏览故事</h2>
+                <!-- 搜索栏 -->
+                <div class="search-bar">
+                    <input type="text" id="storySearch" placeholder="🔍 搜索故事标题、作者..." oninput="searchStories(this.value)">
+                </div>
                 <div class="browse-filters" id="browseFilters">
                     <button class="filter-btn active" onclick="filterByGenre('all')">全部</button>
                 </div>
@@ -928,6 +935,28 @@
                     <div class="genre-name">${g.name}</div>
                 </div>
             `).join('');
+            
+            // 渲染浏览页的筛选按钮
+            renderBrowseFilters();
+        }
+        
+        function renderBrowseFilters() {
+            const genres = [
+                { id: 'all', name: '全部' },
+                { id: '恋爱', name: '💕 恋爱' },
+                { id: '悬疑', name: '🔍 悬疑' },
+                { id: '玄幻', name: '🐉 玄幻' },
+                { id: '科幻', name: '🚀 科幻' },
+                { id: '恐怖', name: '👻 恐怖' },
+                { id: '武侠', name: '⚔️ 武侠' },
+                { id: '搞笑', name: '😂 搞笑' },
+                { id: '霸宠', name: '👑 霸宠' },
+                { id: '穿越', name: '🌀 穿越' }
+            ];
+            const filters = document.getElementById('browseFilters');
+            filters.innerHTML = genres.map(g => `
+                <button class="filter-btn ${g.id === 'all' ? 'active' : ''}" onclick="filterByGenre('${g.id}')">${g.name}</button>
+            `).join('');
         }
 
         function renderHomeFeatured() {
@@ -967,6 +996,64 @@
             const list = document.getElementById('comicList');
             const featured = [...allStories.slice(0, 6), ...allStories.filter(s => ['恋爱','霸宠','搞笑'].includes(s.genre)).slice(0, 3)];
             list.innerHTML = featured.map(story => `
+                <div class="comic-item" onclick="readComic('${story.id}')">
+                    ${story.isVip ? '<span class="vip-badge">VIP</span>' : ''}
+                    <div class="comic-cover">${story.icon}</div>
+                    <div class="comic-info">
+                        <div class="comic-title">${story.title}</div>
+                        <div class="comic-meta">
+                            <span style="color: #94A3B8;">${story.genre}</span>
+                            <span style="color: #94A3B8;">⭐ ${story.rating}</span>
+                            <span style="color: #94A3B8;">👥 ${story.readers}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== 搜索和筛选功能 ==========
+        let currentGenreFilter = 'all';
+        let currentSearchQuery = '';
+        
+        function filterByGenre(genre) {
+            currentGenreFilter = genre;
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            // 渲染筛选结果
+            renderFilteredStories();
+        }
+        
+        function searchStories(query) {
+            currentSearchQuery = query.toLowerCase();
+            renderFilteredStories();
+        }
+        
+        function renderFilteredStories() {
+            const list = document.getElementById('comicList');
+            let filtered = allStories;
+            
+            // 应用类型筛选
+            if (currentGenreFilter !== 'all') {
+                filtered = filtered.filter(s => s.genre === currentGenreFilter);
+            }
+            
+            // 应用搜索筛选
+            if (currentSearchQuery) {
+                filtered = filtered.filter(s => 
+                    s.title.toLowerCase().includes(currentSearchQuery) ||
+                    s.author.toLowerCase().includes(currentSearchQuery) ||
+                    s.genre.includes(currentSearchQuery)
+                );
+            }
+            
+            // 渲染结果
+            if (filtered.length === 0) {
+                list.innerHTML = '<p style="text-align:center;color:#94A3B8;padding:40px;">暂无匹配的故事，请尝试其他关键词</p>';
+                return;
+            }
+            
+            list.innerHTML = filtered.map(story => `
                 <div class="comic-item" onclick="readComic('${story.id}')">
                     ${story.isVip ? '<span class="vip-badge">VIP</span>' : ''}
                     <div class="comic-cover">${story.icon}</div>
