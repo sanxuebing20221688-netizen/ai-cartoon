@@ -12,7 +12,6 @@
             color: #fff;
             min-height: 100vh;
         }
-
         /* 导航 */
         .navbar {
             position: fixed;
@@ -36,10 +35,7 @@
             -webkit-text-fill-color: transparent;
             cursor: pointer;
         }
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
         .nav-link {
             color: #94A3B8;
             text-decoration: none;
@@ -48,21 +44,31 @@
             transition: all 0.3s;
             cursor: pointer;
         }
-        .nav-link:hover, .nav-link.active {
-            color: #fff;
-            background: rgba(255,255,255,0.1);
+        .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,0.1); }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
-
+        .login-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
         /* 页面容器 */
-        .page {
-            display: none;
-            padding-top: 70px;
-            min-height: 100vh;
-        }
+        .page { display: none; padding-top: 70px; min-height: 100vh; }
         .page.active { display: block; }
-
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
         /* Hero */
         .hero { text-align: center; padding: 60px 20px; }
         .hero h1 {
@@ -87,7 +93,6 @@
         .cta-buttons .primary { background: linear-gradient(135deg, #8B5CF6, #EC4899); }
         .cta-buttons .secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
         .cta-buttons a:hover { transform: scale(1.05); }
-
         /* Section */
         .section {
             padding: 40px 20px;
@@ -103,7 +108,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         /* Genre Grid */
         .genre-grid {
             display: grid;
@@ -120,14 +124,10 @@
             cursor: pointer;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .genre-card:hover {
-            transform: scale(1.05);
-            background: rgba(255,255,255,0.1);
-        }
+        .genre-card:hover { transform: scale(1.05); background: rgba(255,255,255,0.1); }
         .genre-icon { font-size: 3rem; margin-bottom: 10px; }
         .genre-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; }
         .genre-desc { font-size: 0.9rem; color: #94A3B8; }
-
         /* Featured */
         .featured-grid {
             display: grid;
@@ -142,8 +142,25 @@
             transition: all 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
+            position: relative;
         }
         .featured-card:hover { background: rgba(255,255,255,0.1); }
+        .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .favorite-btn.active { background: #EC4899; }
         .featured-icon { font-size: 2.5rem; margin-bottom: 10px; }
         .featured-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
         .featured-meta {
@@ -153,7 +170,6 @@
             color: #94A3B8;
             margin-top: 8px;
         }
-
         /* Steps */
         .steps {
             display: flex;
@@ -179,7 +195,6 @@
         .step-icon { font-size: 2rem; margin: 10px 0; }
         .step-title { font-size: 1rem; font-weight: 600; margin-bottom: 5px; }
         .step-desc { font-size: 0.85rem; color: #94A3B8; }
-
         /* Features */
         .features {
             display: grid;
@@ -197,13 +212,8 @@
         .feature-icon { font-size: 2.5rem; margin-bottom: 12px; }
         .feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
         .feature-desc { font-size: 0.9rem; color: #94A3B8; }
-
         /* 创建页面 */
-        .create-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+        .create-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
         .create-section {
             background: rgba(15, 23, 42, 0.5);
             padding: 30px;
@@ -211,14 +221,8 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .create-section h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #EC4899;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .create-section h3 { font-size: 1.5rem; margin-bottom: 20px; color: #EC4899; }
+        .form-group { margin-bottom: 20px; }
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -238,11 +242,7 @@
             outline: none;
             border-color: #8B5CF6;
         }
-        .personality-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        .personality-tags { display: flex; flex-wrap: wrap; gap: 10px; }
         .personality-tag {
             padding: 8px 16px;
             background: rgba(255,255,255,0.05);
@@ -270,13 +270,8 @@
         }
         .btn-primary:hover { transform: scale(1.02); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
         /* 阅读页面 */
-        .read-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .read-container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .comic-panel {
             background: rgba(15, 23, 42, 0.5);
             border-radius: 16px;
@@ -293,9 +288,7 @@
             justify-content: center;
             font-size: 4rem;
         }
-        .panel-content {
-            padding: 20px;
-        }
+        .panel-content { padding: 20px; }
         .dialogue {
             background: rgba(255,255,255,0.05);
             padding: 15px;
@@ -303,21 +296,14 @@
             margin: 10px 0;
             border-left: 3px solid #8B5CF6;
         }
-        .speaker {
-            font-weight: 600;
-            color: #EC4899;
-            margin-bottom: 5px;
-        }
+        .speaker { font-weight: 600; color: #EC4899; margin-bottom: 5px; }
         .choice-container {
             margin-top: 30px;
             padding: 20px;
             background: rgba(139, 92, 246, 0.1);
             border-radius: 12px;
         }
-        .choice-container h4 {
-            margin-bottom: 15px;
-            color: #EC4899;
-        }
+        .choice-container h4 { margin-bottom: 15px; color: #EC4899; }
         .choice-btn {
             display: block;
             width: 100%;
@@ -331,18 +317,9 @@
             transition: all 0.3s;
             text-align: left;
         }
-        .choice-btn:hover {
-            background: rgba(139, 92, 246, 0.3);
-            border-color: #8B5CF6;
-        }
-
+        .choice-btn:hover { background: rgba(139, 92, 246, 0.3); border-color: #8B5CF6; }
         /* 浏览页面 */
-        .browse-filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+        .browse-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .filter-btn {
             padding: 8px 20px;
             background: rgba(255,255,255,0.05);
@@ -369,8 +346,14 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
         }
         .comic-item:hover { transform: translateY(-5px); }
+        .comic-item .favorite-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
         .comic-cover {
             height: 200px;
             background: linear-gradient(135deg, #2a1f4e, #1e1e3f);
@@ -389,7 +372,6 @@
             font-size: 0.85rem;
             color: #94A3B8;
         }
-
         /* 个人中心 */
         .profile-header {
             text-align: center;
@@ -410,12 +392,7 @@
             margin: 0 auto 20px;
         }
         .profile-name { font-size: 1.8rem; font-weight: 600; margin-bottom: 5px; }
-        .profile-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 20px;
-        }
+        .profile-stats { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
         .stat-item { text-align: center; }
         .stat-value { font-size: 2rem; font-weight: 600; color: #EC4899; }
         .stat-label { font-size: 0.85rem; color: #94A3B8; }
@@ -434,7 +411,6 @@
         }
         .achievement-icon { font-size: 2rem; margin-bottom: 10px; }
         .achievement-title { font-size: 0.9rem; font-weight: 600; }
-
         /* Footer */
         .footer {
             text-align: center;
@@ -443,12 +419,8 @@
             margin-top: 40px;
             color: #94A3B8;
         }
-
         /* 加载动画 */
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
+        .loading { text-align: center; padding: 40px; }
         .spinner {
             width: 50px;
             height: 50px;
@@ -459,7 +431,6 @@
             margin: 0 auto 20px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         /* 角色预览 */
         .character-preview {
             text-align: center;
@@ -481,6 +452,56 @@
         }
         .character-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 10px; }
         .character-traits { color: #94A3B8; }
+        /* 登录弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content h2 { margin-bottom: 20px; color: #EC4899; }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal-buttons .primary {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+            color: white;
+        }
+        .modal-buttons .secondary {
+            background: rgba(255,255,255,0.1);
+            color: #94A3B8;
+        }
     </style>
 </head>
 <body>
@@ -492,8 +513,23 @@
             <a class="nav-link" onclick="showPage('create')">创建</a>
             <a class="nav-link" onclick="showPage('browse')">浏览</a>
             <a class="nav-link" onclick="showPage('profile')">我的</a>
+            <div class="user-info" id="userInfo">
+                <button class="login-btn" onclick="showLoginModal()">登录</button>
+            </div>
         </div>
     </nav>
+
+    <!-- 登录弹窗 -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <h2>欢迎来到互动漫画世界</h2>
+            <input type="text" id="loginNickname" placeholder="请输入昵称">
+            <div class="modal-buttons">
+                <button class="secondary" onclick="hideLoginModal()">取消</button>
+                <button class="primary" onclick="login()">开始体验</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 首页 -->
     <div id="home" class="page active">
@@ -535,37 +571,32 @@
                         <div class="genre-name">恐怖</div>
                         <div class="genre-desc">惊悚氛围，刺激体验</div>
                     </div>
+                    <div class="genre-card" onclick="selectGenre('武侠')">
+                        <div class="genre-icon">⚔️</div>
+                        <div class="genre-name">武侠</div>
+                        <div class="genre-desc">江湖恩仇，武林传奇</div>
+                    </div>
+                    <div class="genre-card" onclick="selectGenre('搞笑')">
+                        <div class="genre-icon">😂</div>
+                        <div class="genre-name">搞笑</div>
+                        <div class="genre-desc">轻松幽默，欢乐无限</div>
+                    </div>
+                    <div class="genre-card" onclick="selectGenre('霸宠')">
+                        <div class="genre-icon">👑</div>
+                        <div class="genre-name">霸宠</div>
+                        <div class="genre-desc">甜宠豪门，偶像剧</div>
+                    </div>
+                    <div class="genre-card" onclick="selectGenre('穿越')">
+                        <div class="genre-icon">🌀</div>
+                        <div class="genre-name">穿越</div>
+                        <div class="genre-desc">时空流转，逆天改命</div>
+                    </div>
                 </div>
             </div>
 
             <div class="section">
                 <h2>✨ 本周热门</h2>
-                <div class="featured-grid">
-                    <div class="featured-card" onclick="readComic('comic1')">
-                        <div class="featured-icon">💕</div>
-                        <div class="featured-title">命中注定遇见你</div>
-                        <div class="featured-meta">
-                            <span>⭐ 4.8</span>
-                            <span>👥 12.5K</span>
-                        </div>
-                    </div>
-                    <div class="featured-card" onclick="readComic('comic2')">
-                        <div class="featured-icon">🔍</div>
-                        <div class="featured-title">午夜图书馆</div>
-                        <div class="featured-meta">
-                            <span>⭐ 4.9</span>
-                            <span>👥 8.9K</span>
-                        </div>
-                    </div>
-                    <div class="featured-card" onclick="readComic('comic3')">
-                        <div class="featured-icon">🐉</div>
-                        <div class="featured-title">异世界转生记</div>
-                        <div class="featured-meta">
-                            <span>⭐ 4.7</span>
-                            <span>👥 15K</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="featured-grid" id="homeFeatured"></div>
             </div>
 
             <div class="section">
@@ -634,10 +665,7 @@
     <!-- 创建页面 -->
     <div id="create" class="page">
         <div class="create-container">
-            <h2 style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;">
-                🎨 创建你的专属故事
-            </h2>
-
+            <h2 style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;">🎨 创建你的专属故事</h2>
             <div class="create-section">
                 <h3>📖 步骤1：选择故事类型</h3>
                 <div class="form-group">
@@ -649,6 +677,10 @@
                         <option value="玄幻">🐉 玄幻 - 奇幻世界，冒险启程</option>
                         <option value="科幻">🚀 科幻 - 未来科技，星际冒险</option>
                         <option value="恐怖">👻 恐怖 - 惊悚氛围，刺激体验</option>
+                        <option value="武侠">⚔️ 武侠 - 江湖恩仇，武林传奇</option>
+                        <option value="搞笑">😂 搞笑 - 轻松幽默，欢乐无限</option>
+                        <option value="霸宠">👑 霸宠 - 甜宠豪门，偶像剧</option>
+                        <option value="穿越">🌀 穿越 - 时空流转，逆天改命</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -663,7 +695,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="create-section">
                 <h3>👤 步骤2：创建主角</h3>
                 <div class="form-group">
@@ -700,7 +731,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="create-section">
                 <h3>✨ 角色预览</h3>
                 <div class="character-preview" id="characterPreview">
@@ -709,10 +739,7 @@
                     <div class="character-traits" id="previewTraits">请完善角色信息</div>
                 </div>
             </div>
-
-            <button class="btn-primary" onclick="generateStory()" id="generateBtn">
-                🚀 开始生成故事
-            </button>
+            <button class="btn-primary" onclick="generateStory()" id="generateBtn">🚀 开始生成故事</button>
         </div>
     </div>
 
@@ -730,7 +757,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="choice-container" id="choiceContainer" style="display: none;">
                 <h4>💭 你的选择将影响故事走向</h4>
                 <div id="choices"></div>
@@ -741,22 +767,9 @@
     <!-- 浏览页面 -->
     <div id="browse" class="page">
         <div class="container">
-            <h2 style="text-align: center; margin: 40px 0 20px; background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;">
-                🔍 发现精彩故事
-            </h2>
-
-            <div class="browse-filters">
-                <button class="filter-btn active" onclick="filterComics('all')">全部</button>
-                <button class="filter-btn" onclick="filterComics('恋爱')">💕 恋爱</button>
-                <button class="filter-btn" onclick="filterComics('悬疑')">🔍 悬疑</button>
-                <button class="filter-btn" onclick="filterComics('玄幻')">🐉 玄幻</button>
-                <button class="filter-btn" onclick="filterComics('科幻')">🚀 科幻</button>
-                <button class="filter-btn" onclick="filterComics('恐怖')">👻 恐怖</button>
-            </div>
-
-            <div class="comic-list" id="comicList">
-                <!-- 动态生成 -->
-            </div>
+            <h2 style="text-align: center; margin: 40px 0 20px; background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem;">🔍 发现精彩故事</h2>
+            <div class="browse-filters" id="browseFilters"></div>
+            <div class="comic-list" id="comicList"></div>
         </div>
     </div>
 
@@ -764,139 +777,414 @@
     <div id="profile" class="page">
         <div class="container">
             <div class="profile-header">
-                <div class="profile-avatar">👤</div>
-                <div class="profile-name">Boss Bing</div>
-                <div style="color: #94A3B8;">创作达人 · 结局收集者</div>
+                <div class="profile-avatar" id="profileAvatar">👤</div>
+                <div class="profile-name" id="profileName">未登录</div>
+                <div style="color: #94A3B8;" id="profileTitle">创作达人 · 结局收集者</div>
                 <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="statCreated">3</div>
-                        <div class="stat-label">创作故事</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statRead">12</div>
-                        <div class="stat-label">阅读作品</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statEndings">8</div>
-                        <div class="stat-label">收集结局</div>
-                    </div>
+                    <div class="stat-item"><div class="stat-value" id="statCreated">0</div><div class="stat-label">创作故事</div></div>
+                    <div class="stat-item"><div class="stat-value" id="statRead">0</div><div class="stat-label">阅读作品</div></div>
+                    <div class="stat-item"><div class="stat-value" id="statEndings">0</div><div class="stat-label">收集结局</div></div>
                 </div>
+            </div>
+
+            <div class="section">
+                <h3 style="margin-bottom: 20px; color: #EC4899;">❤️ 我的收藏</h3>
+                <div class="featured-grid" id="myFavorites"></div>
             </div>
 
             <div class="section">
                 <h3 style="margin-bottom: 20px; color: #EC4899;">🏆 我的成就</h3>
                 <div class="achievements">
-                    <div class="achievement">
-                        <div class="achievement-icon">🌟</div>
-                        <div class="achievement-title">初次创作</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">📖</div>
-                        <div class="achievement-title">阅读达人</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">💎</div>
-                        <div class="achievement-title">结局收集者</div>
-                    </div>
-                    <div class="achievement">
-                        <div class="achievement-icon">🔥</div>
-                        <div class="achievement-title">热门作者</div>
-                    </div>
+                    <div class="achievement"><div class="achievement-icon">🌟</div><div class="achievement-title">初次创作</div></div>
+                    <div class="achievement"><div class="achievement-icon">📖</div><div class="achievement-title">阅读达人</div></div>
+                    <div class="achievement"><div class="achievement-icon">💎</div><div class="achievement-title">结局收集者</div></div>
+                    <div class="achievement"><div class="achievement-icon">❤️</div><div class="achievement-title">收藏达人</div></div>
                 </div>
             </div>
 
             <div class="section">
                 <h3 style="margin-bottom: 20px; color: #EC4899;">📚 我的作品</h3>
-                <div class="featured-grid" id="myWorks">
-                    <div class="featured-card" onclick="readComic('my1')">
-                        <div class="featured-icon">💕</div>
-                        <div class="featured-title">命中注定遇见你</div>
-                        <div class="featured-meta">
-                            <span>👁️ 234次阅读</span>
-                            <span>❤️ 56个赞</span>
-                        </div>
-                    </div>
-                    <div class="featured-card" onclick="readComic('my2')">
-                        <div class="featured-icon">🔍</div>
-                        <div class="featured-title">午夜图书馆</div>
-                        <div class="featured-meta">
-                            <span>👁️ 189次阅读</span>
-                            <span>❤️ 43个赞</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="featured-grid" id="myWorks"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // 数据存储
-        let currentCharacter = {
-            name: '',
-            gender: '男',
-            age: '18',
-            personality: [],
-            genre: '',
-            setting: ''
-        };
+        // ========== 用户系统 ==========
+        let currentUser = null;
 
-        let storyProgress = {
-            chapter: 1,
-            choices: [],
-            currentScene: 0
-        };
+        // 从 localStorage 加载用户
+        function loadUser() {
+            const saved = localStorage.getItem('comicUser');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                updateUserUI();
+                loadUserData();
+            }
+        }
 
-        // 漫画数据库
+        // 保存用户到 localStorage
+        function saveUser() {
+            localStorage.setItem('comicUser', JSON.stringify(currentUser));
+        }
+
+        // 更新用户界面
+        function updateUserUI() {
+            const userInfo = document.getElementById('userInfo');
+            if (currentUser) {
+                userInfo.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-avatar">${currentUser.nickname[0]}</div>
+                        <span>${currentUser.nickname}</span>
+                    </div>
+                `;
+            } else {
+                userInfo.innerHTML = `<button class="login-btn" onclick="showLoginModal()">登录</button>`;
+            }
+        }
+
+        // 显示登录弹窗
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        // 隐藏登录弹窗
+        function hideLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+
+        // 登录
+        function login() {
+            const nickname = document.getElementById('loginNickname').value.trim();
+            if (!nickname) {
+                alert('请输入昵称');
+                return;
+            }
+            currentUser = {
+                nickname: nickname,
+                favorites: [],
+                progress: {},
+                stats: { created: 0, read: 0, endings: 0 }
+            };
+            saveUser();
+            updateUserUI();
+            loadUserData();
+            hideLoginModal();
+        }
+
+        // 加载用户数据
+        function loadUserData() {
+            if (!currentUser) return;
+            
+            // 更新个人中心
+            document.getElementById('profileName').textContent = currentUser.nickname;
+            document.getElementById('profileAvatar').textContent = currentUser.nickname[0];
+            document.getElementById('statCreated').textContent = currentUser.stats.created;
+            document.getElementById('statRead').textContent = currentUser.stats.read;
+            document.getElementById('statEndings').textContent = currentUser.stats.endings;
+
+            // 渲染收藏
+            renderFavorites();
+        }
+
+        // 收藏/取消收藏
+        function toggleFavorite(comicId) {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+            
+            const index = currentUser.favorites.indexOf(comicId);
+            if (index > -1) {
+                currentUser.favorites.splice(index, 1);
+            } else {
+                currentUser.favorites.push(comicId);
+            }
+            saveUser();
+            
+            // 重新渲染当前页面
+            if (document.getElementById('browse').classList.contains('active')) {
+                const activeFilter = document.querySelector('.filter-btn.active');
+                if (activeFilter) {
+                    renderComicList(activeFilter.dataset.genre);
+                }
+            } else if (document.getElementById('home').classList.contains('active')) {
+                renderHomeFeatured();
+            }
+            
+            renderFavorites();
+        }
+
+        // 渲染收藏
+        function renderFavorites() {
+            const container = document.getElementById('myFavorites');
+            if (!currentUser || currentUser.favorites.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#94A3B8;">暂无收藏，快去探索好故事吧！</p>';
+                return;
+            }
+            
+            const favorites = comicsDB.filter(c => currentUser.favorites.includes(c.id));
+            container.innerHTML = favorites.map(comic => `
+                <div class="featured-card" onclick="readComic('${comic.id}')">
+                    <button class="favorite-btn active" onclick="event.stopPropagation();toggleFavorite('${comic.id}')">❤️</button>
+                    <div class="featured-icon">${comic.icon}</div>
+                    <div class="featured-title">${comic.title}</div>
+                    <div class="featured-meta">
+                        <span>⭐ ${comic.rating}</span>
+                        <span>👥 ${comic.readers}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 保存阅读进度
+        function saveProgress(comicId, sceneIndex) {
+            if (!currentUser) return;
+            currentUser.progress[comicId] = sceneIndex;
+            saveUser();
+        }
+
+        // ========== 数据存储 ==========
+        let currentCharacter = { name: '', gender: '男', age: '18', personality: [], genre: '', setting: '' };
+        let storyProgress = { chapter: 1, choices: [], currentScene: 0 };
+
+        // ========== 扩展故事数据库 ==========
         const comicsDB = [
-            { id: 'comic1', title: '命中注定遇见你', genre: '恋爱', icon: '💕', rating: 4.8, readers: '12.5K', author: 'AI创作者' },
-            { id: 'comic2', title: '午夜图书馆', genre: '悬疑', icon: '🔍', rating: 4.9, readers: '8.9K', author: '神秘作家' },
-            { id: 'comic3', title: '异世界转生记', genre: '玄幻', icon: '🐉', rating: 4.7, readers: '15K', author: '幻想大师' },
-            { id: 'comic4', title: '星际迷航', genre: '科幻', icon: '🚀', rating: 4.6, readers: '6.7K', author: '科幻先锋' },
-            { id: 'comic5', title: '深夜鬼话', genre: '恐怖', icon: '👻', rating: 4.5, readers: '5.3K', author: '恐怖作家' },
-            { id: 'comic6', title: '青春恋曲', genre: '恋爱', icon: '💕', rating: 4.8, readers: '9.8K', author: '浪漫诗人' },
+            // 恋爱
+            { id: 'romance1', title: '命中注定遇见你', genre: '恋爱', icon: '💕', rating: 4.8, readers: '12.5K', author: 'AI创作者', chapters: 10 },
+            { id: 'romance2', title: '甜蜜青梅竹马', genre: '恋爱', icon: '🎋', rating: 4.7, readers: '8.2K', author: '甜心作家', chapters: 8 },
+            { id: 'romance3', title: '合约恋人', genre: '恋爱', icon: '📝', rating: 4.6, readers: '6.5K', author: '浪漫诗人', chapters: 12 },
+            { id: 'romance4', title: '追光者', genre: '恋爱', icon: '✨', rating: 4.9, readers: '9.8K', author: '追光少年', chapters: 15 },
+            // 悬疑
+            { id: 'mystery1', title: '午夜图书馆', genre: '悬疑', icon: '🔍', rating: 4.9, readers: '8.9K', author: '神秘作家', chapters: 12 },
+            { id: 'mystery2', title: '血色真相', genre: '悬疑', icon: '🩸', rating: 4.7, readers: '5.6K', author: '推理大师', chapters: 10 },
+            { id: 'mystery3', title: '消失的记忆', genre: '悬疑', icon: '💭', rating: 4.8, readers: '7.3K', author: '记忆碎片', chapters: 8 },
+            { id: 'mystery4', title: '暗夜追踪', genre: '悬疑', icon: '🌙', rating: 4.6, readers: '4.9K', author: '夜行侠', chapters: 10 },
+            // 玄幻
+            { id: 'fantasy1', title: '异世界转生记', genre: '玄幻', icon: '🐉', rating: 4.7, readers: '15K', author: '幻想大师', chapters: 20 },
+            { id: 'fantasy2', title: '神龙觉醒', genre: '玄幻', icon: '🐲', rating: 4.8, readers: '11.2K', author: '龙之传人', chapters: 18 },
+            { id: 'fantasy3', title: '仙途问道', genre: '玄幻', icon: '⛰️', rating: 4.6, readers: '9.5K', author: '修仙者', chapters: 15 },
+            { id: 'fantasy4', title: '魔法学园', genre: '玄幻', icon: '🧙', rating: 4.7, readers: '8.8K', author: '魔法少女', chapters: 12 },
+            { id: 'fantasy5', title: '灵魂之书', genre: '玄幻', icon: '📖', rating: 4.5, readers: '6.2K', author: '灵魂写手', chapters: 10 },
+            // 科幻
+            { id: 'scifi1', title: '星际迷航', genre: '科幻', icon: '🚀', rating: 4.6, readers: '6.7K', author: '科幻先锋', chapters: 15 },
+            { id: 'scifi2', title: '机械之心', genre: '科幻', icon: '🤖', rating: 4.7, readers: '7.3K', author: '机械师', chapters: 12 },
+            { id: 'scifi3', title: '时空管理局', genre: '科幻', icon: '⏰', rating: 4.8, readers: '8.9K', author: '时空旅人', chapters: 18 },
+            { id: 'scifi4', title: '赛博朋克', genre: '科幻', icon: '🌃', rating: 4.5, readers: '5.1K', author: '霓虹使者', chapters: 10 },
+            // 恐怖
+            { id: 'horror1', title: '深夜鬼话', genre: '恐怖', icon: '👻', rating: 4.5, readers: '5.3K', author: '恐怖作家', chapters: 8 },
+            { id: 'horror2', title: '古宅惊魂', genre: '恐怖', icon: '🏚️', rating: 4.6, readers: '6.8K', author: '鬼故事', chapters: 10 },
+            { id: 'horror3', title: '生化危机', genre: '恐怖', icon: '🦠', rating: 4.7, readers: '7.2K', author: '幸存者', chapters: 12 },
+            { id: 'horror4', title: '梦境杀手', genre: '恐怖', icon: '🔪', rating: 4.8, readers: '8.1K', author: '梦境分析师', chapters: 15 },
+            // 武侠
+            { id: 'wuxia1', title: '剑侠情缘', genre: '武侠', icon: '⚔️', rating: 4.8, readers: '9.5K', author: '江湖剑客', chapters: 20 },
+            { id: 'wuxia2', title: '天下第一', genre: '武侠', icon: '🏆', rating: 4.7, readers: '8.2K', author: '武林盟主', chapters: 18 },
+            { id: 'wuxia3', title: '倚天屠龙', genre: '武侠', icon: '🐉', rating: 4.9, readers: '12.3K', author: '金庸迷', chapters: 25 },
+            { id: 'wuxia4', title: '风云再起', genre: '武侠', icon: '🌪️', rating: 4.6, readers: '7.8K', author: '风云人物', chapters: 15 },
+            // 搞笑
+            { id: 'comedy1', title: '沙雕日常', genre: '搞笑', icon: '😂', rating: 4.9, readers: '15.6K', author: '沙雕网友', chapters: 30 },
+            { id: 'comedy2', title: '逗比室友', genre: '搞笑', icon: '😆', rating: 4.8, readers: '11.2K', author: '欢乐颂', chapters: 25 },
+            { id: 'comedy3', title: '职场笑话', genre: '搞笑', icon: '💼', rating: 4.7, readers: '8.9K', author: '上班族', chapters: 20 },
+            { id: 'comedy4', title: '校园逗事', genre: '搞笑', icon: '🎓', rating: 4.8, readers: '10.5K', author: '学生党', chapters: 22 },
+            // 霸宠
+            { id: 'rich1', title: '豪门总裁', genre: '霸宠', icon: '👑', rating: 4.8, readers: '13.2K', author: '霸总文', chapters: 25 },
+            { id: 'rich2', title: '偶像巨星', genre: '霸宠', icon: '⭐', rating: 4.9, readers: '14.5K', author: '星探', chapters: 28 },
+            { id: 'rich3', title: '契约娇妻', genre: '霸宠', icon: '💍', rating: 4.7, readers: '11.8K', author: '甜宠控', chapters: 22 },
+            { id: 'rich4', title: '偏执boss', genre: '霸宠', icon: '🎩', rating: 4.6, readers: '9.3K', author: 'boss控', chapters: 20 },
+            // 穿越
+            { id: 'cross1', title: '穿越公主', genre: '穿越', icon: '👸', rating: 4.8, readers: '12.8K', author: '穿越者', chapters: 25 },
+            { id: 'cross2', title: '回到过去', genre: '穿越', icon: '⏪', rating: 4.7, readers: '10.2K', author: '时光机', chapters: 20 },
+            { id: 'cross3', title: '异世界美食', genre: '穿越', icon: '🍳', rating: 4.9, readers: '11.5K', author: '吃货穿越', chapters: 22 },
+            { id: 'cross4', title: '农门贵女', genre: '穿越', icon: '🌾', rating: 4.6, readers: '8.7K', author: '种田文', chapters: 18 },
         ];
 
-        // 故事场景数据
+        // ========== 扩展故事场景数据 ==========
         const storyScenes = {
-            comic1: [
-                {
-                    panel: '💕',
-                    dialogues: [
-                        { speaker: '旁白', text: '春天的午后，樱花飘落的校园小道上...' },
-                        { speaker: '男主角', text: '（抬头看樱花）真美啊...' },
-                        { speaker: '旁白', text: '就在这时，一个身影从转角处出现，撞入了你的视线。' }
-                    ],
-                    choices: [
-                        { text: '🌹 上前搭讪', next: 1 },
-                        { text: '👀 悄悄观察', next: 2 }
-                    ]
-                },
-                {
-                    panel: '🌸',
-                    dialogues: [
-                        { speaker: '你', text: '那个...请问你知道图书馆怎么走吗？' },
-                        { speaker: '她', text: '（微笑）正好我也要去图书馆，一起走吧。' },
-                        { speaker: '旁白', text: '你们并肩走在樱花树下，心跳不由自主地加快了。' }
-                    ],
-                    choices: [
-                        { text: '💬 继续聊天', next: 3 },
-                        { text: '😊 安静陪伴', next: 4 }
-                    ]
-                }
-            ]
+            // 武侠故事 - 剑侠情缘
+            wuxia1: generateWuxiaStory('剑侠情缘', '⚔️'),
+            wuxia2: generateWuxiaStory('天下第一', '🏆'),
+            wuxia3: generateWuxiaStory('倚天屠龙', '🐉'),
+            wuxia4: generateWuxiaStory('风云再起', '🌪️'),
+            // 搞笑故事 - 沙雕日常
+            comedy1: generateComedyStory('沙雕日常', '😂'),
+            comedy2: generateComedyStory('逗比室友', '😆'),
+            comedy3: generateComedyStory('职场笑话', '💼'),
+            comedy4: generateComedyStory('校园逗事', '🎓'),
+            // 霸宠故事 - 豪门总裁
+            rich1: generateRichStory('豪门总裁', '👑'),
+            rich2: generateRichStory('偶像巨星', '⭐'),
+            rich3: generateRichStory('契约娇妻', '💍'),
+            rich4: generateRichStory('偏执boss', '🎩'),
+            // 穿越故事 - 穿越公主
+            cross1: generateCrossStory('穿越公主', '👸'),
+            cross2: generateCrossStory('回到过去', '⏪'),
+            cross3: generateCrossStory('异世界美食', '🍳'),
+            cross4: generateCrossStory('农门贵女', '🌾'),
+            // 原有的恋爱故事
+            romance1: generateRomanceStory('命中注定遇见你', '💕'),
+            romance2: generateRomanceStory('甜蜜青梅竹马', '🎋'),
+            // 原有的悬疑故事
+            mystery1: generateMysteryStory('午夜图书馆', '🔍'),
+            mystery2: generateMysteryStory('血色真相', '🩸'),
+            // 原有的玄幻故事
+            fantasy1: generateFantasyStory('异世界转生记', '🐉'),
+            // 原有的科幻故事
+            scifi1: generateScifiStory('星际迷航', '🚀'),
+            // 原有的恐怖故事
+            horror1: generateHorrorStory('深夜鬼话', '👻'),
         };
 
-        // 页面切换
+        // 生成器函数
+        function generateWuxiaStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:`江湖风波起，${title}的故事从现在开始...`}], choices:[{text:'🔨 练功',next:1},{text:'🏃 逃跑',next:2}] },
+                { panel: '⚡', dialogues: [{speaker:'师父',text:'今日起，你正式成为本门弟子，需勤学武艺！'}], choices:[{text:'💪 苦练',next:3},{text:'🤔 偷懒',next:4}] },
+                { panel: '🌲', dialogues: [{speaker:'你',text:'十年后，我终于练成绝技，下山闯荡江湖！'}], choices:[{text:'⚔️ 行侠仗义',next:5},{text:'🏔️ 归隐山林',next:6}] },
+                { panel: '🎯', dialogues: [{speaker:'侠客',text:'少侠救命之恩，没齿难忘！'}], choices:[{text:'🤝 结拜',next:7},{text:'😊 离去',next:8}] },
+                { panel: '👑', dialogues: [{speaker:'江湖',text:'你成为一代大侠，名震天下！'}], choices:[], ending:'大侠结局' },
+                { panel: '🌸', dialogues: [{speaker:'佳人',text:'愿与君归隐江湖，共享余生！'}], choices:[], ending:'归隐结局' },
+            ];
+        }
+
+        function generateComedyStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'主角',text:`今天又是沙雕的一天...`}], choices:[{text:'😴 睡觉',next:1},{text:'🍕 吃饭',next:2}] },
+                { panel: '😴', dialogues: [{speaker:'闹钟',text:'叮铃铃！'}], choices:[{text:'⏰ 继续睡',next:3},{text:'😤 起床',next:4}] },
+                { panel: '🚿', dialogues: [{speaker:'你',text:'洗澡时唱歌也太好笑了！'}], choices:[{text:'🎤 继续唱',next:5},{text:'🛁 安静',next:6}] },
+                { panel: '😂', dialogues: [{speaker:'朋友',text:'你刚才的样子笑死我了！'}], choices:[{text:'🤪 一起笑',next:7}], ending:'沙雕日常' },
+            ];
+        }
+
+        function generateRichStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:`豪门总裁${title}，霸道总裁的甜蜜日常...`}], choices:[{text:'💼 开会',next:1},{text:'😴 休息',next:2}] },
+                { panel: '👔', dialogues: [{speaker:'总裁',text:'女人，你成功引起了我的注意！'}], choices:[{text:'😠 生气',next:3},{text:'😊 微笑',next:4}] },
+                { panel: '💕', dialogues: [{speaker:'秘书',text:'总裁，这是今天的行程...'}], choices:[{text:'📅 继续工作',next:5},{text:'☕ 喝咖啡',next:6}] },
+                { panel: '💝', dialogues: [{speaker:'总裁',text:'我的心，只为你跳动...'}], choices:[], ending:'甜宠结局' },
+            ];
+        }
+
+        function generateCrossStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:`一觉醒来，你发现自己穿越到了${title}...`}], choices:[{text:'😱 惊慌',next:1},{text:'😊 接受',next:2}] },
+                { panel: '🌀', dialogues: [{speaker:'系统',text:'欢迎来到异世界！'}], choices:[{text:'📋 查看任务',next:3},{text:'🏃 探索',next:4}] },
+                { panel: '🌟', dialogues: [{speaker:'你',text:'既然来了，就要活出精彩！'}], choices:[{text:'👑 争夺权力',next:5},{text:'❤️ 寻找真爱',next:6}] },
+                { panel: '🎉', dialogues: [{speaker:'人生',text:'你完成了逆天改命！'}], choices:[], ending:'穿越成功' },
+            ];
+        }
+
+        function generateRomanceStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:'春天的午后，樱花飘落的校园小道上...'}], choices:[{text:'🌹 上前搭讪',next:1},{text:'👀 悄悄观察',next:2}] },
+                { panel: '🌸', dialogues: [{speaker:'你',text:'那个...请问你知道图书馆怎么走吗？'}], choices:[{text:'💬 继续聊天',next:3},{text:'😊 安静陪伴',next:4}] },
+                { panel: '💕', dialogues: [{speaker:'她',text:'我们...是不是在哪里见过？'}], choices:[], ending:'浪漫结局' },
+            ];
+        }
+
+        function generateMysteryStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:'深夜的图书馆，灯火通明却空无一人...'}], choices:[{text:'🔦 继续前进',next:1},{text:'🏃 转身离开',next:2}] },
+                { panel: '👻', dialogues: [{speaker:'声音',text:'你终于来了...'}], choices:[{text:'❓ 询问',next:3},{text:'⚡ 逃跑',next:4}] },
+                { panel: '🔍', dialogues: [{speaker:'真相',text:'一切都是幻觉？'}], choices:[], ending:'悬疑结局' },
+            ];
+        }
+
+        function generateFantasyStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:'一道光芒闪过，你来到了异世界...'}], choices:[{text:'🐉 探索',next:1},{text:'🧙 求助',next:2}] },
+                { panel: '🏰', dialogues: [{speaker:'NPC',text:'勇者，欢迎来到魔法世界！'}], choices:[{text:'⚔️ 接受使命',next:3},{text:'🛡️ 婉拒',next:4}] },
+                { panel: '👑', dialogues: [{speaker:'国王',text:'只有你能拯救我们的王国！'}], choices:[], ending:'英雄结局' },
+            ];
+        }
+
+        function generateScifiStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'AI',text:'欢迎来到星际时代，人类'}], choices:[{text:'🚀 探索宇宙',next:1},{text:'🛡️ 保护地球',next:2}] },
+                { panel: '🌌', dialogues: [{speaker:'舰长',text:'前方发现不明物体！'}], choices:[{text:'⚔️ 战斗',next:3},{text:'📞 沟通',next:4}] },
+                { panel: '🏆', dialogues: [{speaker:'人类',text:'你是星际英雄！'}], choices:[], ending:'英雄结局' },
+            ];
+        }
+
+        function generateHorrorStory(title, icon) {
+            return [
+                { panel: icon, dialogues: [{speaker:'旁白',text:'午夜的钟声响起...'}], choices:[{text:'🔦 开灯',next:1},{text:'😱 躲藏',next:2}] },
+                { panel: '👻', dialogues: [{speaker:'鬼',text:'我找到你了...'}], choices:[{text:'🧹 反击',next:3},{text:'🏃 逃跑',next:4}] },
+                { panel: '💀', dialogues: [{speaker:'结局',text:'你永远留在了这里...'}], choices:[], ending:'恐怖结局' },
+            ];
+        }
+
+        // ========== 页面切换 ==========
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-
             document.getElementById(pageId).classList.add('active');
             event?.target?.classList?.add('active');
 
             if (pageId === 'browse') {
+                renderBrowseFilters();
                 renderComicList('all');
+            } else if (pageId === 'home') {
+                renderHomeFeatured();
+            } else if (pageId === 'profile') {
+                loadUserData();
             }
+        }
+
+        // 渲染首页热门
+        function renderHomeFeatured() {
+            const container = document.getElementById('homeFeatured');
+            const featured = comicsDB.slice(0, 6);
+            container.innerHTML = featured.map(comic => `
+                <div class="featured-card" onclick="readComic('${comic.id}')">
+                    <button class="favorite-btn ${currentUser?.favorites?.includes(comic.id) ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${comic.id}')">${currentUser?.favorites?.includes(comic.id) ? '❤️' : '🤍'}</button>
+                    <div class="featured-icon">${comic.icon}</div>
+                    <div class="featured-title">${comic.title}</div>
+                    <div class="featured-meta">
+                        <span>⭐ ${comic.rating}</span>
+                        <span>👥 ${comic.readers}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 渲染浏览筛选
+        function renderBrowseFilters() {
+            const genres = ['all', '恋爱', '悬疑', '玄幻', '科幻', '恐怖', '武侠', '搞笑', '霸宠', '穿越'];
+            const icons = {all:'📚',恋爱:'💕',悬疑:'🔍',玄幻:'🐉',科幻:'🚀',恐怖:'👻',武侠:'⚔️',搞笑:'😂',霸宠:'👑',穿越:'🌀'};
+            const container = document.getElementById('browseFilters');
+            container.innerHTML = genres.map(g => `
+                <button class="filter-btn ${g === 'all' ? 'active' : ''}" onclick="filterComics('${g}')" data-genre="${g}">${icons[g]} ${g === 'all' ? '全部' : g}</button>
+            `).join('');
+        }
+
+        // 渲染漫画列表
+        function renderComicList(filter) {
+            const list = document.getElementById('comicList');
+            const filtered = filter === 'all' ? comicsDB : comicsDB.filter(c => c.genre === filter);
+
+            list.innerHTML = filtered.map(comic => `
+                <div class="comic-item" onclick="readComic('${comic.id}')">
+                    <button class="favorite-btn ${currentUser?.favorites?.includes(comic.id) ? 'active' : ''}" onclick="event.stopPropagation();toggleFavorite('${comic.id}')">${currentUser?.favorites?.includes(comic.id) ? '❤️' : '🤍'}</button>
+                    <div class="comic-cover">${comic.icon}</div>
+                    <div class="comic-info">
+                        <div class="comic-title">${comic.title}</div>
+                        <div class="comic-author">by ${comic.author}</div>
+                        <div class="comic-stats">
+                            <span>⭐ ${comic.rating}</span>
+                            <span>👥 ${comic.readers}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 更新筛选按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.filter-btn[data-genre="${filter}"]`)?.classList.add('active');
+        }
+
+        // 筛选漫画
+        function filterComics(genre) {
+            renderComicList(genre);
         }
 
         // 选择故事类型
@@ -910,11 +1198,8 @@
         function togglePersonality(element, trait) {
             element.classList.toggle('selected');
             const index = currentCharacter.personality.indexOf(trait);
-            if (index > -1) {
-                currentCharacter.personality.splice(index, 1);
-            } else {
-                currentCharacter.personality.push(trait);
-            }
+            if (index > -1) { currentCharacter.personality.splice(index, 1); }
+            else { currentCharacter.personality.push(trait); }
             updatePreview();
         }
 
@@ -934,10 +1219,7 @@
             if (currentCharacter.personality.length > 0) traits.push(currentCharacter.personality.join('、'));
 
             document.getElementById('previewTraits').textContent = traits.join(' · ') || '请完善角色信息';
-
-            // 更新头像
-            const avatar = document.querySelector('.character-avatar');
-            avatar.textContent = currentCharacter.gender === '女' ? '👩' : '👨';
+            document.querySelector('.character-avatar').textContent = currentCharacter.gender === '女' ? '👩' : '👨';
         }
 
         // 生成故事
@@ -951,11 +1233,23 @@
             btn.disabled = true;
             btn.textContent = '⏳ AI正在创作中...';
 
-            // 模拟AI生成
+            // 更新用户统计
+            if (currentUser) {
+                currentUser.stats.created++;
+                saveUser();
+            }
+
             setTimeout(() => {
                 btn.disabled = false;
                 btn.textContent = '🚀 开始生成故事';
-                readComic('comic1');
+                // 随机选择一个该类型的漫画
+                const genreComics = comicsDB.filter(c => c.genre === currentCharacter.genre);
+                if (genreComics.length > 0) {
+                    const randomComic = genreComics[Math.floor(Math.random() * genreComics.length)];
+                    readComic(randomComic.id);
+                } else {
+                    readComic('romance1');
+                }
             }, 2000);
         }
 
@@ -963,12 +1257,19 @@
         function readComic(comicId) {
             showPage('read');
             storyProgress = { chapter: 1, choices: [], currentScene: 0 };
+            
+            // 更新用户统计
+            if (currentUser) {
+                currentUser.stats.read++;
+                saveUser();
+            }
+            
             renderScene(comicId, 0);
         }
 
         // 渲染场景
         function renderScene(comicId, sceneIndex) {
-            const scenes = storyScenes[comicId] || storyScenes.comic1;
+            const scenes = storyScenes[comicId] || storyScenes.romance1 || [];
             const scene = scenes[sceneIndex] || scenes[0];
 
             document.getElementById('panelImage').textContent = scene.panel;
@@ -987,12 +1288,24 @@
             if (scene.choices && scene.choices.length > 0) {
                 choiceContainer.style.display = 'block';
                 choicesDiv.innerHTML = scene.choices.map(choice => `
-                    <button class="choice-btn" onclick="makeChoice('${comicId}', ${choice.next})">
-                        ${choice.text}
-                    </button>
+                    <button class="choice-btn" onclick="makeChoice('${comicId}', ${choice.next})">${choice.text}</button>
                 `).join('');
             } else {
                 choiceContainer.style.display = 'none';
+                // 显示结局
+                if (scene.ending) {
+                    storyContent.innerHTML += `
+                        <div class="dialogue" style="border-left-color: #10B981; background: rgba(16, 185, 129, 0.1);">
+                            <div class="speaker" style="color: #10B981;">🎉 ${scene.ending}</div>
+                            <div>恭喜你完成了这个故事！</div>
+                        </div>
+                    `;
+                    // 更新结局统计
+                    if (currentUser) {
+                        currentUser.stats.endings++;
+                        saveUser();
+                    }
+                }
             }
         }
 
@@ -1000,43 +1313,21 @@
         function makeChoice(comicId, nextScene) {
             storyProgress.choices.push(nextScene);
             storyProgress.currentScene = nextScene;
+            saveProgress(comicId, nextScene);
             renderScene(comicId, nextScene);
 
             // 更新统计
-            const endings = parseInt(document.getElementById('statEndings').textContent);
-            document.getElementById('statEndings').textContent = endings + 1;
-        }
-
-        // 渲染漫画列表
-        function renderComicList(filter) {
-            const list = document.getElementById('comicList');
-            const filtered = filter === 'all' ? comicsDB : comicsDB.filter(c => c.genre === filter);
-
-            list.innerHTML = filtered.map(comic => `
-                <div class="comic-item" onclick="readComic('${comic.id}')">
-                    <div class="comic-cover">${comic.icon}</div>
-                    <div class="comic-info">
-                        <div class="comic-title">${comic.title}</div>
-                        <div class="comic-author">by ${comic.author}</div>
-                        <div class="comic-stats">
-                            <span>⭐ ${comic.rating}</span>
-                            <span>👥 ${comic.readers}</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 筛选漫画
-        function filterComics(genre) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderComicList(genre);
+            if (currentUser) {
+                const endings = parseInt(document.getElementById('statEndings').textContent);
+                document.getElementById('statEndings').textContent = endings + 1;
+            }
         }
 
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
+            loadUser();
             updatePreview();
+            renderHomeFeatured();
         });
     </script>
 </body>
