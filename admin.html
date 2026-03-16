@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI互动漫画平台 - 管理后台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #8B5CF6;
+            --secondary: #EC4899;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg-dark: #0F172A;
+            --bg-card: rgba(30, 41, 59, 0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* 登录页面 */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #94A3B8;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #CBD5E1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        /* 管理界面 */
+        .admin-container {
+            display: none;
+        }
+
+        .admin-container.active {
+            display: block;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.98);
+            padding: 20px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header {
+            padding: 10px 0 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            color: #94A3B8;
+            font-size: 0.85rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #94A3B8;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #94A3B8;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-card h3 {
+            color: #94A3B8;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+
+        /* 数据表格 */
+        .data-table {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        th {
+            background: rgba(0,0,0,0.2);
+            color: #94A3B8;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .action-btn {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* 图表区域 */
+        .chart-container {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <h1>🎭 管理后台</h1>
+            <p>AI互动漫画平台管理系统</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>管理员账号</label>
+                    <input type="text" id="adminUsername" placeholder="请输入账号" required>
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="adminPassword" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn-primary">登录</button>
+            </form>
+            <p style="margin-top: 20px; font-size: 0.85rem;">
+                默认账号：admin / admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- 管理界面 -->
+    <div class="admin-container" id="adminPanel">
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>🎭 管理后台</h2>
+                <p>欢迎回来，管理员</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" onclick="showSection('dashboard')">📊 数据概览</a></li>
+                <li><a href="#" onclick="showSection('users')">👥 用户管理</a></li>
+                <li><a href="#" onclick="showSection('stories')">📚 故事管理</a></li>
+                <li><a href="#" onclick="showSection('payments')">💰 支付记录</a></li>
+                <li><a href="#" onclick="showSection('reports')">📈 数据报表</a></li>
+                <li><a href="#" onclick="showSection('settings')">⚙️ 系统设置</a></li>
+                <li><a href="#" onclick="handleLogout()">🚪 退出登录</a></li>
+            </ul>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 数据概览 -->
+            <section id="dashboard" class="content-section active">
+                <div class="page-header">
+                    <h1>📊 数据概览</h1>
+                    <p>平台运营数据实时监控</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>总用户数</h3>
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-change positive">↑ 12.5% 较上月</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总故事数</h3>
+                        <div class="stat-value" id="totalStories">0</div>
+                        <div class="stat-change positive">↑ 8.3% 较上月</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>总收入</h3>
+                        <div class="stat-value" id="totalRevenue">¥0</div>
+                        <div class="stat-change positive">↑ 15.2% 较上月</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>AI创作次数</h3>
+                        <div class="stat-value" id="aiCreations">0</div>
+                        <div class="stat-change positive">↑ 22.1% 较上月</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>📈 用户增长趋势</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        [图表区域 - 需要接入图表库如 Chart.js]
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3>最新动态</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>事件</th>
+                                <th>用户</th>
+                                <th>详情</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityLog">
+                            <tr>
+                                <td>刚刚</td>
+                                <td>新用户注册</td>
+                                <td>user_123</td>
+                                <td>通过微信登录</td>
+                            </tr>
+                            <tr>
+                                <td>2分钟前</td>
+                                <td>AI创作</td>
+                                <td>user_456</td>
+                                <td>创作了恋爱故事《命中注定》</td>
+                            </tr>
+                            <tr>
+                                <td>5分钟前</td>
+                                <td>充值</td>
+                                <td>user_789</td>
+                                <td>充值 ¥50 获得550积分</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 用户管理 -->
+            <section id="users" class="content-section">
+                <div class="page-header">
+                    <h1>👥 用户管理</h1>
+                    <p>管理平台所有用户</p>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3>用户列表</h3>
+                        <input type="text" placeholder="搜索用户..." style="padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户ID</th>
+                                <th>昵称</th>
+                                <th>积分</th>
+                                <th>创作数</th>
+                                <th>注册时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <!-- 动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 故事管理 -->
+            <section id="stories" class="content-section">
+                <div class="page-header">
+                    <h1>📚 故事管理</h1>
+                    <p>管理平台所有故事内容</p>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <h3>故事列表</h3>
+                        <select style="padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                            <option>全部类型</option>
+                            <option>恋爱</option>
+                            <option>悬疑</option>
+                            <option>玄幻</option>
+                        </select>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>故事ID</th>
+                                <th>标题</th>
+                                <th>类型</th>
+                                <th>作者</th>
+                                <th>阅读量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="storiesTable">
+                            <!-- 动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // 管理员账号（实际应该在后端验证）
+        const ADMIN_ACCOUNTS = {
+            'admin': 'admin123',
+            'benson': 'benson2024'
+        };
+
+        // 登录处理
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (ADMIN_ACCOUNTS[username] && ADMIN_ACCOUNTS[username] === password) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('adminPanel').classList.add('active');
+                loadDashboardData();
+                alert('登录成功！');
+            } else {
+                alert('账号或密码错误！');
+            }
+        }
+
+        // 退出登录
+        function handleLogout() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminPanel').classList.remove('active');
+        }
+
+        // 显示对应区域
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            document.getElementById(sectionId).classList.add('active');
+
+            // 更新菜单激活状态
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // 加载对应数据
+            if (sectionId === 'users') loadUsersData();
+            if (sectionId === 'stories') loadStoriesData();
+        }
+
+        // 加载仪表板数据
+        function loadDashboardData() {
+            // 模拟数据（实际应从后端API获取）
+            document.getElementById('totalUsers').textContent = '1,258';
+            document.getElementById('totalStories').textContent = '3,456';
+            document.getElementById('totalRevenue').textContent = '¥48,900';
+            document.getElementById('aiCreations').textContent = '2,340';
+        }
+
+        // 加载用户数据
+        function loadUsersData() {
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = `
+                <tr>
+                    <td>user_001</td>
+                    <td>小明</td>
+                    <td>550</td>
+                    <td>12</td>
+                    <td>2026-03-15</td>
+                    <td><span class="badge badge-success">正常</span></td>
+                    <td>
+                        <button class="action-btn">查看</button>
+                        <button class="action-btn">编辑</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>user_002</td>
+                    <td>小红</td>
+                    <td>1200</td>
+                    <td>25</td>
+                    <td>2026-03-10</td>
+                    <td><span class="badge badge-success">正常</span></td>
+                    <td>
+                        <button class="action-btn">查看</button>
+                        <button class="action-btn">编辑</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // 加载故事数据
+        function loadStoriesData() {
+            const tbody = document.getElementById('storiesTable');
+            tbody.innerHTML = `
+                <tr>
+                    <td>story_001</td>
+                    <td>命中注定遇见你</td>
+                    <td>恋爱</td>
+                    <td>小明</td>
+                    <td>12,500</td>
+                    <td><span class="badge badge-success">已发布</span></td>
+                    <td>
+                        <button class="action-btn">查看</button>
+                        <button class="action-btn">编辑</button>
+                        <button class="action-btn" style="color: var(--danger);">删除</button>
+                    </td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+</html>
