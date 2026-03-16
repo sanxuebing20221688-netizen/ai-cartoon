@@ -278,6 +278,31 @@
         .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
         .modal-buttons .primary { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; }
         .modal-buttons .secondary { background: rgba(255,255,255,0.1); color: #94A3B8; }
+        /* 充值系统 */
+        .points-display { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; }
+        .points-value { font-size: 2.5rem; font-weight: 700; color: #FBBF24; }
+        .btn-recharge { background: linear-gradient(135deg, #8B5CF6, #EC4899); border: none; padding: 12px 24px; border-radius: 8px; color: white; font-size: 1rem; cursor: pointer; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #94A3B8; font-size: 2rem; cursor: pointer; }
+        .recharge-content { max-width: 600px !important; position: relative; }
+        .recharge-packages { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .package-card { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+        .package-card:hover { border-color: var(--secondary); transform: translateY(-2px); }
+        .package-card.popular { border-color: #FBBF24; background: rgba(251, 191, 36, 0.1); }
+        .package-card.selected { border-color: var(--secondary); background: rgba(139, 92, 246, 0.2); }
+        .package-badge { font-size: 0.85rem; color: #94A3B8; margin-bottom: 10px; }
+        .package-card.popular .package-badge { color: #FBBF24; font-weight: 600; }
+        .package-points { font-size: 1.8rem; font-weight: 700; color: white; margin: 10px 0; }
+        .package-price { font-size: 1.5rem; color: var(--secondary); font-weight: 600; margin-bottom: 10px; }
+        .package-desc { font-size: 0.9rem; color: #10B981; }
+        .payment-methods { margin: 20px 0; }
+        .payment-methods h4 { margin-bottom: 15px; color: #94A3B8; }
+        .payment-options { display: flex; gap: 15px; justify-content: center; }
+        .payment-option { flex: 1; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 10px; justify-content: center; }
+        .payment-option:hover { border-color: var(--secondary); }
+        .payment-option.selected { border-color: var(--secondary); background: rgba(139, 92, 246, 0.2); }
+        .payment-icon { font-size: 1.5rem; }
+        .recharge-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .selected-info { color: #94A3B8; margin-bottom: 15px; }
         /* Footer */
         .footer { text-align: center; padding: 30px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; color: #94A3B8; }
     </style>
@@ -303,6 +328,65 @@
             <div class="modal-buttons">
                 <button class="secondary" onclick="hideLoginModal()">取消</button>
                 <button class="primary" onclick="login()">开始体验</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 充值弹窗 -->
+    <div class="modal" id="rechargeModal">
+        <div class="modal-content recharge-content">
+            <button class="modal-close" onclick="hideRechargeModal()">×</button>
+            <h2>💎 积分充值</h2>
+            
+            <div class="recharge-packages">
+                <div class="package-card" onclick="selectPackage('basic')">
+                    <div class="package-badge">基础包</div>
+                    <div class="package-points">100积分</div>
+                    <div class="package-price">¥10</div>
+                    <div class="package-desc">适合尝鲜体验</div>
+                </div>
+                
+                <div class="package-card popular" onclick="selectPackage('standard')">
+                    <div class="package-badge">热销</div>
+                    <div class="package-points">550积分</div>
+                    <div class="package-price">¥50</div>
+                    <div class="package-desc">送50积分！</div>
+                </div>
+                
+                <div class="package-card" onclick="selectPackage('premium')">
+                    <div class="package-badge">超值</div>
+                    <div class="package-points">1200积分</div>
+                    <div class="package-price">¥100</div>
+                    <div class="package-desc">送200积分！</div>
+                </div>
+                
+                <div class="package-card" onclick="selectPackage('vip')">
+                    <div class="package-badge vip">VIP</div>
+                    <div class="package-points">3000积分</div>
+                    <div class="package-price">¥200</div>
+                    <div class="package-desc">送500积分！</div>
+                </div>
+            </div>
+            
+            <div class="payment-methods">
+                <h4>选择支付方式</h4>
+                <div class="payment-options">
+                    <div class="payment-option selected" onclick="selectPayment('wechat')">
+                        <span class="payment-icon">💬</span>
+                        <span>微信支付</span>
+                    </div>
+                    <div class="payment-option" onclick="selectPayment('alipay')">
+                        <span class="payment-icon">💳</span>
+                        <span>支付宝</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recharge-footer">
+                <p class="selected-info" id="selectedPackage">已选择：基础包（100积分）- ¥10</p>
+                <button class="btn-primary btn-large" onclick="processPayment()">
+                    确认支付
+                </button>
             </div>
         </div>
     </div>
@@ -578,7 +662,10 @@
             </div>
             <div class="section">
                 <h3>💰 我的积分</h3>
-                <div class="stat-value" id="myPoints">0</div>
+                <div class="points-display">
+                    <div class="points-value" id="myPoints">0</div>
+                    <button class="btn-recharge" onclick="showRechargeModal()">💎 立即充值</button>
+                </div>
             </div>
             <div class="section">
                 <h3>❤️ 我的收藏</h3>
@@ -1213,6 +1300,71 @@
 
         function showLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function hideLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        
+        // ========== 支付系统 ==========
+        let selectedPackageType = 'basic';
+        let selectedPaymentMethod = 'wechat';
+        
+        const packages = {
+            basic: { points: 100, price: 10, name: '基础包' },
+            standard: { points: 550, price: 50, name: '标准包' },
+            premium: { points: 1200, price: 100, name: '超值包' },
+            vip: { points: 3000, price: 200, name: 'VIP包' }
+        };
+        
+        function showRechargeModal() {
+            if (!currentUser) {
+                showLoginModal();
+                return;
+            }
+            document.getElementById('rechargeModal').classList.add('active');
+        }
+        
+        function hideRechargeModal() {
+            document.getElementById('rechargeModal').classList.remove('active');
+        }
+        
+        function selectPackage(type) {
+            selectedPackageType = type;
+            // 更新UI
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // 更新选择信息
+            const pkg = packages[type];
+            document.getElementById('selectedPackage').textContent = 
+                `已选择：${pkg.name}（${pkg.points}积分）- ¥${pkg.price}`;
+        }
+        
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            // 更新UI
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+        
+        function processPayment() {
+            const pkg = packages[selectedPackageType];
+            
+            // 模拟支付流程（实际需要接入微信/支付宝API）
+            alert(`支付功能开发中...\n\n套餐：${pkg.name}\n积分：${pkg.points}\n金额：¥${pkg.price}\n支付方式：${selectedPaymentMethod === 'wechat' ? '微信支付' : '支付宝'}\n\n提示：需要接入微信/支付宝商户API才能实现真实支付`);
+            
+            // 模拟支付成功（测试用）
+            const confirmed = confirm('模拟支付成功？\n\n点击"确定"模拟支付成功，积分将到账');
+            if (confirmed) {
+                // 充值成功
+                currentUser.points += pkg.points;
+                saveUser();
+                loadUserData();
+                
+                hideRechargeModal();
+                alert(`充值成功！\n\n获得 ${pkg.points} 积分\n当前积分：${currentUser.points}`);
+            }
+        }
         function login() {
             const nickname = document.getElementById('loginNickname').value.trim();
             if (!nickname) return alert('请输入昵称');
