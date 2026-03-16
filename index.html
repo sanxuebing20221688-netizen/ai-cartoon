@@ -241,7 +241,11 @@
         .step.completed .step-number { background: #10B981; color: white; }
         .step-label { font-size: 0.85rem; color: #94A3B8; }
         .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 15px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #8B5CF6, #EC4899); width: 0%; transition: width 0.5s; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #8B5CF6, #EC4899); width: 0%; transition: width 0.5s; position: relative; overflow: hidden; }
+        .progress-fill::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 100% { left: 100%; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .step.active .step-number { animation: pulse 1s infinite; }
         .progress-text { text-align: center; color: #94A3B8; }
         /* 阅读页面 */
         .read-container { max-width: 900px; margin: 0 auto; padding: 20px; }
