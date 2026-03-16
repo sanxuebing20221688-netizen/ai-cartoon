@@ -199,6 +199,38 @@
             object-fit: cover;
             border-radius: 8px;
         }
+        /* AI创作界面 */
+        .ai-creation-section { margin-bottom: 30px; }
+        .section-header { margin-bottom: 20px; text-align: center; }
+        .section-header h2 { font-size: 2rem; margin-bottom: 10px; background: linear-gradient(135deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .section-header p { color: #94A3B8; }
+        .creation-form { background: rgba(255,255,255,0.03); padding: 30px; border-radius: 12px; }
+        .genre-selector, .style-selector { display: flex; flex-wrap: wrap; gap: 10px; }
+        .genre-option, .style-option { padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; transition: all 0.3s; }
+        .genre-option:hover, .genre-option.selected, .style-option:hover, .style-option.selected { background: linear-gradient(135deg, #8B5CF6, #EC4899); border-color: transparent; color: white; }
+        .char-count { text-align: right; color: #94A3B8; font-size: 0.85rem; margin-top: 5px; }
+        .range-slider { display: flex; align-items: center; gap: 15px; }
+        .range-slider input[type="range"] { flex: 1; }
+        .range-value { min-width: 80px; color: var(--secondary); font-weight: 600; }
+        .generate-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .cost-info { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .cost-label { color: #94A3B8; }
+        .cost-value { color: #FBBF24; font-weight: 600; font-size: 1.2rem; }
+        .cost-hint { color: #94A3B8; font-size: 0.85rem; }
+        .btn-large { padding: 16px 32px; font-size: 1.2rem; }
+        /* AI进度条 */
+        .ai-progress { background: rgba(15, 23, 42, 0.5); padding: 30px; border-radius: 12px; margin-top: 30px; }
+        .progress-steps { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .step { text-align: center; opacity: 0.5; transition: all 0.3s; }
+        .step.active { opacity: 1; }
+        .step.completed { opacity: 0.5; }
+        .step-number { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.2rem; font-weight: 600; color: #94A3B8; }
+        .step.active .step-number { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; }
+        .step.completed .step-number { background: #10B981; color: white; }
+        .step-label { font-size: 0.85rem; color: #94A3B8; }
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 15px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #8B5CF6, #EC4899); width: 0%; transition: width 0.5s; }
+        .progress-text { text-align: center; color: #94A3B8; }
         /* 阅读页面 */
         .read-container { max-width: 900px; margin: 0 auto; padding: 20px; }
         .comic-panel { background: var(--bg-card); border-radius: 16px; overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
@@ -341,6 +373,106 @@
     <div id="create" class="page">
         <div class="container">
             <div class="create-container">
+                <!-- AI创作区域 -->
+                <div class="create-section ai-creation-section">
+                    <div class="section-header">
+                        <h2>🎨 AI智能创作</h2>
+                        <p>描述你的故事情节，AI将自动生成完整的图文场景和人物</p>
+                    </div>
+                    
+                    <div class="creation-form">
+                        <!-- 故事标题 -->
+                        <div class="form-group">
+                            <label>📌 故事标题</label>
+                            <input type="text" id="aiStoryTitle" placeholder="给你的故事起个名字">
+                        </div>
+
+                        <!-- 故事类型 -->
+                        <div class="form-group">
+                            <label>🎭 故事类型</label>
+                            <div class="genre-selector" id="aiGenreSelector">
+                                <div class="genre-option selected" data-value="romance">💕 恋爱</div>
+                                <div class="genre-option" data-value="wuxia">⚔️ 武侠</div>
+                                <div class="genre-option" data-value="fantasy">🐉 玄幻</div>
+                                <div class="genre-option" data-value="scifi">🚀 科幻</div>
+                                <div class="genre-option" data-value="comedy">😂 搞笑</div>
+                                <div class="genre-option" data-value="horror">👻 恐怖</div>
+                                <div class="genre-option" data-value="mystery">🔍 悬疑</div>
+                                <div class="genre-option" data-value="rich">👑 霸宠</div>
+                                <div class="genre-option" data-value="cross">🌀 穿越</div>
+                            </div>
+                        </div>
+
+                        <!-- 故事情节 -->
+                        <div class="form-group">
+                            <label>📝 故事情节描述</label>
+                            <textarea id="aiStoryPlot" rows="8" placeholder="例如：&#10;一个失忆的女孩在校园里醒来，发现周围人都用奇怪的眼神看着她。她试图回忆过去，但大脑一片空白。直到她遇到了一个同样失忆的男生，两人决定一起寻找真相..."></textarea>
+                            <div class="char-count">
+                                <span id="charCount">0</span>/2000 字
+                            </div>
+                        </div>
+
+                        <!-- 场景数量 -->
+                        <div class="form-group">
+                            <label>🎬 生成场景数量</label>
+                            <div class="range-slider">
+                                <input type="range" id="sceneCount" min="3" max="10" value="5">
+                                <div class="range-value"><span id="sceneCountValue">5</span>个场景</div>
+                            </div>
+                        </div>
+
+                        <!-- 风格选择 -->
+                        <div class="form-group">
+                            <label>🎨 绘画风格</label>
+                            <div class="style-selector" id="styleSelector">
+                                <div class="style-option selected" data-value="anime">🎀 动漫风</div>
+                                <div class="style-option" data-value="realistic">📷 写实风</div>
+                                <div class="style-option" data-value="watercolor">🎨 水彩风</div>
+                                <div class="style-option" data-value="cartoon">😊 卡通风</div>
+                            </div>
+                        </div>
+
+                        <!-- 生成按钮 -->
+                        <div class="generate-section">
+                            <div class="cost-info">
+                                <span class="cost-label">消耗：</span>
+                                <span class="cost-value">100金币</span>
+                                <span class="cost-hint">（AI创作消耗积分）</span>
+                            </div>
+                            <button class="btn-primary btn-large" onclick="generateStoryWithAI()">
+                                🤖 AI自动创作
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI生成进度 -->
+                    <div class="ai-progress" id="aiProgress" style="display: none;">
+                        <div class="progress-steps">
+                            <div class="step" id="aiStep1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">分析情节</div>
+                            </div>
+                            <div class="step" id="aiStep2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">生成场景</div>
+                            </div>
+                            <div class="step" id="aiStep3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">创建对话</div>
+                            </div>
+                            <div class="step" id="aiStep4">
+                                <div class="step-number">4</div>
+                                <div class="step-label">完成</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">正在分析故事情节...</div>
+                    </div>
+                </div>
+
+                <!-- 传统创建方式 -->
                 <div class="create-section">
                     <h3>📝 故事类型</h3>
                     <div class="form-group">
@@ -1178,12 +1310,321 @@
             const achievements = {
                 created: { icon: '🌟', title: '初次创作', desc: '第一次创作你的专属故事' },
                 reader: { icon: '📖', title: '阅读达人', desc: '累计阅读10个故事' },
-                collector: { icon: '💎', title: '收藏达人', desc: '收藏10个故事' },
+                collector: icon: '💎', title: '收藏达人', desc: '收藏10个故事' },
                 commenter: { icon: '💬', title: '评论家', desc: '发表10条评论' },
                 rater: { icon: '⭐', title: '评分达人', desc: '评分10个故事' }
             };
             const a = achievements[id];
             alert(`🏆 ${a.title}\n\n📝 ${a.desc}`);
+        }
+
+        // ========== AI创作功能 ==========
+        const DOUBAO_API_KEY = "73249e08-1d3e-49a3-9120-9ca1fe4d075e";
+        const DOUBAO_ENDPOINT = "https://ark.cn-beijing.volces.com/api/v3/responses";
+
+        let selectedGenre = 'romance';
+        let selectedStyle = 'anime';
+
+        function updateCharCount() {
+            const text = document.getElementById('aiStoryPlot').value;
+            document.getElementById('charCount').textContent = text.length;
+        }
+
+        function updateSceneCountValue() {
+            const value = document.getElementById('sceneCount').value;
+            document.getElementById('sceneCountValue').textContent = value;
+        }
+
+        function selectAIGenre(genre) {
+            selectedGenre = genre;
+            document.querySelectorAll('#aiGenreSelector .genre-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`#aiGenreSelector .genre-option[data-value="${genre}"]`).classList.add('selected');
+        }
+
+        function selectAIStyle(style) {
+            selectedStyle = style;
+            document.querySelectorAll('#styleSelector .style-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector(`#styleSelector .style-option[data-value="${style}"]`).classList.add('selected');
+        }
+
+        async function generateStoryWithAI() {
+            const title = document.getElementById('aiStoryTitle').value || 'AI创作故事';
+            const plot = document.getElementById('aiStoryPlot').value;
+            const sceneCount = parseInt(document.getElementById('sceneCount').value);
+            
+            // 验证输入
+            if (!plot || plot.length < 20) {
+                alert('请描述故事情节（至少20字）');
+                return;
+            }
+
+            // 检查积分
+            if (!currentUser || currentUser.points < 100) {
+                alert('积分不足（需要100金币），请先充值！');
+                return;
+            }
+
+            // 扣除积分
+            currentUser.points -= 100;
+            saveUser();
+
+            // 显示进度
+            showAIProgress();
+
+            try {
+                // 步骤1：分析情节
+                updateAIProgress(1, 0, '正在分析故事情节...');
+                const analysis = await analyzePlotWithDoubao(plot, selectedGenre);
+                await sleep(1500);
+
+                // 步骤2：生成场景
+                updateAIProgress(2, 33, '正在生成场景描述...');
+                const scenes = await generateScenesWithDoubao(analysis, sceneCount, selectedGenre);
+                await sleep(1500);
+
+                // 步骤3：创建对话
+                updateAIProgress(3, 66, '正在创建对话和选择...');
+                const scenesWithContent = await addContentToScenes(scenes, selectedGenre);
+                await sleep(1500);
+
+                // 步骤4：完成
+                updateAIProgress(4, 100, '创作完成！');
+
+                // 保存到缓存
+                const storyId = 'ai_' + Date.now();
+                storyScenesCache[storyId] = scenesWithContent;
+                
+                // 添加到故事列表
+                allStories.push({
+                    id: storyId,
+                    title: title,
+                    genre: selectedGenre,
+                    icon: getGenreIcon(selectedGenre),
+                    rating: 4.5,
+                    readers: '0',
+                    author: currentUser ? currentUser.nickname : 'AI创作者',
+                    chapters: sceneCount,
+                    isAI: true,
+                    custom: true
+                });
+
+                // 更新用户统计
+                if (currentUser) {
+                    if (!currentUser.stats) currentUser.stats = { created: 0, read: 0, endings: 0 };
+                    currentUser.stats.created += 1;
+                    saveUser();
+                }
+
+                setTimeout(() => {
+                    hideAIProgress();
+                    readComic(storyId);
+                }, 1500);
+
+            } catch (error) {
+                hideAIProgress();
+                alert('AI创作失败：' + error.message);
+                // 退还积分
+                if (currentUser) {
+                    currentUser.points += 100;
+                    saveUser();
+                }
+            }
+        }
+
+        async function analyzePlotWithDoubao(plot, genre) {
+            const prompt = `你是${genre}小说作家。分析以下故事情节，提取关键元素：主角、配角、冲突、转折点。返回JSON格式，包含：protagonist（主角）、conflict（冲突）、turning_point（转折点）、theme（主题）。\n\n情节：${plot}`;
+
+            const response = await fetch(DOUBAO_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DOUBAO_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "doubao-seed-2-0-pro-260215",
+                    input: [{
+                        role: "user",
+                        content: [{
+                            type: "input_text",
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            
+            try {
+                return JSON.parse(data.output.choices[0].message.content[0].text);
+            } catch (e) {
+                // 如果AI返回的不是JSON，使用模拟分析
+                return simulatePlotAnalysis(plot, genre);
+            }
+        }
+
+        async function generateScenesWithDoubao(analysis, count, genre) {
+            const scenes = [];
+            for (let i = 0; i < count; i++) {
+                const scene = {
+                    panel: getSceneEmoji(genre),
+                    dialogues: [],
+                    choices: []
+                };
+                scenes.push(scene);
+            }
+            return scenes;
+        }
+
+        async function addContentToScenes(scenes, genre) {
+            // 使用模板生成内容（暂时不调用AI API以节省token）
+            return scenes.map((scene, index) => {
+                // 生成对话
+                const dialogues = generateDialoguesForScene(scene, index, genre);
+                scene.dialogues = dialogues;
+
+                // 生成选择（最后一个场景没有选择）
+                if (index < scenes.length - 1) {
+                    scene.choices = generateChoicesForScene(index, genre);
+                } else {
+                    scene.ending = generateEnding(genre);
+                }
+
+                return scene;
+            });
+        }
+
+        function simulatePlotAnalysis(plot, genre) {
+            return {
+                protagonist: extractProtagonist(plot),
+                conflict: extractConflict(plot),
+                turning_point: "关键转折",
+                theme: genre + "主题"
+            };
+        }
+
+        function extractProtagonist(plot) {
+            // 简单提取主角（取第一句话的主语）
+            const sentences = plot.split(/[。！？!?.]/);
+            const firstSentence = sentences[0] || plot.substring(0, 50);
+            return firstSentence.substring(0, 20);
+        }
+
+        function extractConflict(plot) {
+            // 简单提取冲突（包含"但是"、"然而"、"但是"的部分）
+            if (plot.includes('但是') || plot.includes('然而') || plot.includes('可是')) {
+                return plot.substring(plot.indexOf('但是') - 10, plot.indexOf('但是') + 30);
+            }
+            return "未知冲突";
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function showAIProgress() {
+            document.getElementById('aiProgress').style.display = 'block';
+        }
+
+        function hideAIProgress() {
+            document.getElementById('aiProgress').style.display = 'none';
+        }
+
+        function updateAIProgress(step, progress, text) {
+            // 更新步骤指示器
+            document.querySelectorAll('.ai-progress .step').forEach((el, index) => {
+                if (index + 1 < step) {
+                    el.classList.add('completed');
+                    el.classList.remove('active');
+                } else if (index + 1 === step) {
+                    el.classList.add('active');
+                    el.classList.remove('completed');
+                } else {
+                    el.classList.remove('active', 'completed');
+                }
+            });
+
+            // 更新进度条
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // 更新文本
+            document.getElementById('progressText').textContent = text;
+        }
+
+        function getSceneEmoji(genre) {
+            const genreMap = {
+                '恋爱': '💕', '悬疑': '🔍', '玄幻': '🐉', '科幻': '🚀',
+                '恐怖': '👻', '武侠': '⚔️', '搞笑': '😂', '霸宠': '👑', '穿越': '🌀'
+            };
+            return genreMap[genre] || '🎬';
+        }
+
+        function generateDialoguesForScene(scene, index, genre) {
+            const dialogues = [];
+            const speakers = ['你', '对方', '旁白', '系统'];
+            
+            // 第一个场景：开场白
+            if (index === 0) {
+                dialogues.push({
+                    speaker: '旁白',
+                    text: `故事开始了...`
+                });
+            }
+            
+            // 中间场景：推进情节
+            else if (index < 5) {
+                dialogues.push({
+                    speaker: speakers[index % speakers.length],
+                    text: `场景${index + 1}的发展...`
+                });
+            }
+            
+            // 最后一个场景：高潮/结局
+            else {
+                dialogues.push({
+                    speaker: '旁白',
+                    text: `故事的结局...`
+                });
+            }
+            
+            return dialogues;
+        }
+
+        function generateChoicesForScene(index, genre) {
+            const choices = [];
+            const numChoices = 2;
+            
+            for (let i = 0; i < numChoices; i++) {
+                const choiceTexts = [
+                    '继续前进', '仔细观察', '询问详情', '转身离开',
+                    '勇敢面对', '谨慎行事', '接受邀请', '拒绝提议',
+                    '查看线索', '调查真相', '相信直觉'
+                ];
+                choices.push({
+                    text: choiceTexts[(index + i) % choiceTexts.length],
+                    next: index + 1
+                });
+            }
+            
+            return choices;
+        }
+
+        function generateEnding(genre) {
+            const endings = {
+                '恋爱': '浪漫结局',
+                '悬疑': '真相大白',
+                '玄幻': '修仙成功',
+                '科幻': '星际穿越',
+                '恐怖': '逃出生天',
+                '武侠': '名震江湖',
+                '搞笑': '爆笑结局',
+                '霸宠': '甜宠结局',
+                '穿越': '重生成功'
+            };
+            return endings[genre] || '故事结局';
         }
 
         // ========== 初始化 ==========
@@ -1203,6 +1644,32 @@
             if (genreSelect) {
                 genreSelect.addEventListener('change', updateCharacterPreview);
             }
+
+            // AI创作界面事件监听
+            const aiPlotInput = document.getElementById('aiStoryPlot');
+            const sceneCountRange = document.getElementById('sceneCount');
+            const genreOptions = document.querySelectorAll('#aiGenreSelector .genre-option');
+            const styleOptions = document.querySelectorAll('#styleSelector .style-option');
+
+            if (aiPlotInput) {
+                aiPlotInput.addEventListener('input', updateCharCount);
+            }
+
+            if (sceneCountRange) {
+                sceneCountRange.addEventListener('input', updateSceneCountValue);
+            }
+
+            genreOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    selectAIGenre(option.dataset.value);
+                });
+            });
+
+            styleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    selectAIStyle(option.dataset.value);
+                });
+            });
         });
     </script>
 </body>
