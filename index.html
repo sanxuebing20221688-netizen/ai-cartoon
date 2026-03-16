@@ -305,6 +305,14 @@
         .selected-info { color: #94A3B8; margin-bottom: 15px; }
         /* Footer */
         .footer { text-align: center; padding: 30px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; color: #94A3B8; }
+        /* 数据管理 */
+        .data-management { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-secondary, .btn-danger { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #94A3B8; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); color: white; }
+        .btn-danger { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.3); }
+        .data-hint { margin-top: 15px; color: #64748B; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -678,6 +686,15 @@
             <div class="section">
                 <h3>📚 我的作品</h3>
                 <div class="featured-grid" id="myWorks"></div>
+            </div>
+            <div class="section">
+                <h3>⚙️ 数据管理</h3>
+                <div class="data-management">
+                    <button class="btn-secondary" onclick="exportUserData()">📤 导出数据</button>
+                    <button class="btn-secondary" onclick="importUserData()">📥 导入数据</button>
+                    <button class="btn-danger" onclick="clearUserData()">🗑️ 清除数据</button>
+                </div>
+                <p class="data-hint">💡 定期导出数据可防止数据丢失</p>
             </div>
         </div>
     </div>
@@ -2134,7 +2151,104 @@
                     selectAIStyle(option.dataset.value);
                 });
             });
+
+            // 自动备份数据（每小时一次）
+            setInterval(() => {
+                if (currentUser) {
+                    console.log('自动备份数据...');
+                    saveUser();
+                }
+            }, 3600000); // 1小时
         });
+
+        // ========== 数据备份与恢复 ==========
+        function exportUserData() {
+            if (!currentUser) {
+                alert('请先登录！');
+                return;
+            }
+
+            const backup = {
+                version: 'V4.2',
+                timestamp: new Date().toISOString(),
+                user: currentUser,
+                stories: JSON.parse(localStorage.getItem('aiComicStories') || '{}'),
+                settings: {
+                    hasUsedAICreation: localStorage.getItem('hasUsedAICreation')
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-comic-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('数据备份成功！文件已下载');
+        }
+
+        function importUserData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = (event) => {
+                    try {
+                        const backup = JSON.parse(event.target.result);
+                        
+                        if (!backup.version || !backup.user) {
+                            throw new Error('无效的备份文件');
+                        }
+
+                        // 恢复用户数据
+                        currentUser = backup.user;
+                        saveUser();
+
+                        // 恢复故事数据
+                        if (backup.stories) {
+                            localStorage.setItem('aiComicStories', JSON.stringify(backup.stories));
+                        }
+
+                        // 恢复设置
+                        if (backup.settings) {
+                            Object.entries(backup.settings).forEach(([key, value]) => {
+                                if (value) localStorage.setItem(key, value);
+                            });
+                        }
+
+                        loadUserData();
+                        alert('数据恢复成功！');
+                    } catch (error) {
+                        alert('数据恢复失败：' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearUserData() {
+            if (!confirm('确定要清除所有数据吗？\n\n此操作不可恢复！')) {
+                return;
+            }
+
+            if (!confirm('再次确认：清除所有用户数据、故事和设置？')) {
+                return;
+            }
+
+            localStorage.clear();
+            currentUser = null;
+            alert('所有数据已清除，页面将刷新');
+            location.reload();
+        }
     </script>
 </body>
 </html>
