@@ -640,16 +640,16 @@
 
             <!-- 创作方式切换 -->
             <div class="create-tabs" style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center;">
-                <button class="tab-btn active" id="traditionalTab" onclick="switchCreateMode('traditional')" style="padding: 12px 24px; border: none; border-radius: 25px; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer; font-weight: 600;">
+                <button class="tab-btn" id="traditionalTab" onclick="switchCreateMode('traditional')" style="padding: 12px 24px; border: 2px solid #8B5CF6; border-radius: 25px; background: transparent; color: #8B5CF6; cursor: pointer; font-weight: 600; transition: all 0.3s;">
                     📝 传统创建
                 </button>
-                <button class="tab-btn" id="aiTab" onclick="switchCreateMode('ai')" style="padding: 12px 24px; border: 2px solid #8B5CF6; border-radius: 25px; background: transparent; color: #8B5CF6; cursor: pointer; font-weight: 600;">
+                <button class="tab-btn active" id="aiTab" onclick="switchCreateMode('ai')" style="padding: 12px 24px; border: none; border-radius: 25px; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
                     🤖 AI智能创作
                 </button>
             </div>
 
             <!-- 传统创建模式 -->
-            <div id="traditionalCreate">
+            <div id="traditionalCreate" style="display: none;">
             <div class="create-section">
                 <h3>📖 步骤1：选择故事类型</h3>
                 <div class="form-group">
@@ -728,7 +728,7 @@
             </div>
 
             <!-- AI智能创作模式 -->
-            <div id="aiCreate" style="display: none;">
+            <div id="aiCreate" style="display: block;">
                 <!-- 消耗提示 -->
                 <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2)); border: 1px solid #F59E0B; border-radius: 12px; padding: 15px; margin-bottom: 25px; text-align: center;">
                     <div style="font-size: 1.2rem; font-weight: 600; color: #FBBF24;">💰 100 金币/次</div>
