@@ -638,6 +638,18 @@
                 🎨 创建你的专属故事
             </h2>
 
+            <!-- 创作方式切换 -->
+            <div class="create-tabs" style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center;">
+                <button class="tab-btn active" id="traditionalTab" onclick="switchCreateMode('traditional')" style="padding: 12px 24px; border: none; border-radius: 25px; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer; font-weight: 600;">
+                    📝 传统创建
+                </button>
+                <button class="tab-btn" id="aiTab" onclick="switchCreateMode('ai')" style="padding: 12px 24px; border: 2px solid #8B5CF6; border-radius: 25px; background: transparent; color: #8B5CF6; cursor: pointer; font-weight: 600;">
+                    🤖 AI智能创作
+                </button>
+            </div>
+
+            <!-- 传统创建模式 -->
+            <div id="traditionalCreate">
             <div class="create-section">
                 <h3>📖 步骤1：选择故事类型</h3>
                 <div class="form-group">
@@ -713,6 +725,161 @@
             <button class="btn-primary" onclick="generateStory()" id="generateBtn">
                 🚀 开始生成故事
             </button>
+            </div>
+
+            <!-- AI智能创作模式 -->
+            <div id="aiCreate" style="display: none;">
+                <!-- 消耗提示 -->
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2)); border: 1px solid #F59E0B; border-radius: 12px; padding: 15px; margin-bottom: 25px; text-align: center;">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: #FBBF24;">💰 100 金币/次</div>
+                    <div style="font-size: 0.9rem; color: #94A3B8; margin-top: 5px;">使用豆包AI智能生成完整故事</div>
+                </div>
+
+                <!-- 步骤1：故事标题 -->
+                <div class="create-section">
+                    <h3>📌 步骤1：故事标题</h3>
+                    <div class="form-group">
+                        <label>输入故事标题</label>
+                        <input type="text" id="aiStoryTitle" placeholder="给你的故事起个名字" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3); background: rgba(15, 23, 42, 0.5); color: white; font-size: 1rem;">
+                    </div>
+                </div>
+
+                <!-- 步骤2：故事类型 -->
+                <div class="create-section">
+                    <h3>🎭 步骤2：选择故事类型（9种）</h3>
+                    <div class="ai-genre-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                        <div class="ai-genre-card" data-value="恋爱" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">💕</div>
+                            <div style="font-weight: 600;">恋爱</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">甜蜜邂逅</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="悬疑" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🔍</div>
+                            <div style="font-weight: 600;">悬疑</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">真相待揭</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="玄幻" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🐉</div>
+                            <div style="font-weight: 600;">玄幻</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">奇幻世界</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="科幻" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🚀</div>
+                            <div style="font-weight: 600;">科幻</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">星际冒险</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="恐怖" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">👻</div>
+                            <div style="font-weight: 600;">恐怖</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">惊悚刺激</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="搞笑" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">😂</div>
+                            <div style="font-weight: 600;">搞笑</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">轻松幽默</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="霸宠" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">👑</div>
+                            <div style="font-weight: 600;">霸宠</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">豪门总裁</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="穿越" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🌀</div>
+                            <div style="font-weight: 600;">穿越</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">时空穿越</div>
+                        </div>
+                        <div class="ai-genre-card" data-value="武侠" onclick="selectAIGenre(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">⚔️</div>
+                            <div style="font-weight: 600;">武侠</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">江湖侠义</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="aiSelectedGenre" value="">
+                </div>
+
+                <!-- 步骤3：故事情节 -->
+                <div class="create-section">
+                    <h3>📖 步骤3：故事情节</h3>
+                    <div class="form-group">
+                        <label>描述你想要的故事情节（最多2000字）</label>
+                        <textarea id="aiStoryPlot" placeholder="例如：一个普通大学生意外获得超能力，在城市中守护正义..." style="width: 100%; height: 150px; padding: 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3); background: rgba(15, 23, 42, 0.5); color: white; font-size: 1rem; resize: vertical;" onkeyup="updateCharCount()"></textarea>
+                        <div style="text-align: right; margin-top: 8px; font-size: 0.9rem; color: #94A3B8;">
+                            <span id="charCount">0</span> / 2000 字
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤4：场景数量 -->
+                <div class="create-section">
+                    <h3>🎬 步骤4：场景数量（3-10个场景）</h3>
+                    <div class="form-group">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <input type="range" id="aiSceneCount" min="3" max="10" value="5" style="flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); outline: none; -webkit-appearance: none;" oninput="updateSceneCountValue(this.value)">
+                            <div style="background: linear-gradient(135deg, #8B5CF6, #EC4899); padding: 10px 20px; border-radius: 8px; font-weight: 600; min-width: 60px; text-align: center;">
+                                <span id="sceneCountValue">5</span> 个场景
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤5：绘画风格 -->
+                <div class="create-section">
+                    <h3>🎨 步骤5：选择绘画风格（4种）</h3>
+                    <div class="style-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;">
+                        <div class="style-card" data-value="anime" onclick="selectAIStyle(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🎌</div>
+                            <div style="font-weight: 600;">日式动漫</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">经典日系风格</div>
+                        </div>
+                        <div class="style-card" data-value="realistic" onclick="selectAIStyle(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">📷</div>
+                            <div style="font-weight: 600;">写实风格</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">逼真细腻</div>
+                        </div>
+                        <div class="style-card" data-value="pixel" onclick="selectAIStyle(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">👾</div>
+                            <div style="font-weight: 600;">像素风格</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">复古像素</div>
+                        </div>
+                        <div class="style-card" data-value="watercolor" onclick="selectAIStyle(this)" style="background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <div style="font-size: 2.5rem; margin-bottom: 8px;">🎨</div>
+                            <div style="font-weight: 600;">水彩画风</div>
+                            <div style="font-size: 0.8rem; color: #94A3B8;">柔和唯美</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="aiSelectedStyle" value="">
+                </div>
+
+                <!-- 进度指示器（生成时显示） -->
+                <div id="aiProgress" style="display: none; margin: 30px 0;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🤖 AI正在创作中...</h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <div class="progress-step active" id="step1" style="text-align: center; flex: 1;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #8B5CF6, #EC4899); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-weight: 600;">1</div>
+                            <div style="font-size: 0.85rem;">分析情节</div>
+                        </div>
+                        <div class="progress-step" id="step2" style="text-align: center; flex: 1;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-weight: 600;">2</div>
+                            <div style="font-size: 0.85rem;">生成角色</div>
+                        </div>
+                        <div class="progress-step" id="step3" style="text-align: center; flex: 1;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-weight: 600;">3</div>
+                            <div style="font-size: 0.85rem;">构建场景</div>
+                        </div>
+                        <div class="progress-step" id="step4" style="text-align: center; flex: 1;">
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-weight: 600;">4</div>
+                            <div style="font-size: 0.85rem;">生成对话</div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(139, 92, 246, 0.2); height: 4px; border-radius: 2px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; background: linear-gradient(90deg, #8B5CF6, #EC4899); width: 0%; transition: width 0.5s;"></div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="generateAIStory()" id="aiGenerateBtn" style="width: 100%; padding: 16px; font-size: 1.1rem; margin-top: 20px;">
+                    🤖 使用豆包AI生成故事 (消耗100金币)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1038,6 +1205,202 @@
         document.addEventListener('DOMContentLoaded', () => {
             updatePreview();
         });
+
+        // ========== AI创作功能 ==========
+        // 切换创作模式
+        function switchCreateMode(mode) {
+            const traditionalTab = document.getElementById('traditionalTab');
+            const aiTab = document.getElementById('aiTab');
+            const traditionalCreate = document.getElementById('traditionalCreate');
+            const aiCreate = document.getElementById('aiCreate');
+
+            if (mode === 'traditional') {
+                traditionalTab.classList.add('active');
+                traditionalTab.style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+                traditionalTab.style.color = 'white';
+                traditionalTab.style.border = 'none';
+                aiTab.classList.remove('active');
+                aiTab.style.background = 'transparent';
+                aiTab.style.color = '#8B5CF6';
+                aiTab.style.border = '2px solid #8B5CF6';
+                traditionalCreate.style.display = 'block';
+                aiCreate.style.display = 'none';
+            } else {
+                aiTab.classList.add('active');
+                aiTab.style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+                aiTab.style.color = 'white';
+                aiTab.style.border = 'none';
+                traditionalTab.classList.remove('active');
+                traditionalTab.style.background = 'transparent';
+                traditionalTab.style.color = '#8B5CF6';
+                traditionalTab.style.border = '2px solid #8B5CF6';
+                traditionalCreate.style.display = 'none';
+                aiCreate.style.display = 'block';
+            }
+        }
+
+        // 选择AI故事类型
+        function selectAIGenre(element) {
+            document.querySelectorAll('.ai-genre-card').forEach(card => {
+                card.style.border = '2px solid transparent';
+                card.style.background = 'rgba(255,255,255,0.05)';
+            });
+            element.style.border = '2px solid #8B5CF6';
+            element.style.background = 'rgba(139, 92, 246, 0.2)';
+            document.getElementById('aiSelectedGenre').value = element.dataset.value;
+        }
+
+        // 选择AI绘画风格
+        function selectAIStyle(element) {
+            document.querySelectorAll('.style-card').forEach(card => {
+                card.style.border = '2px solid transparent';
+                card.style.background = 'rgba(255,255,255,0.05)';
+            });
+            element.style.border = '2px solid #EC4899';
+            element.style.background = 'rgba(236, 72, 153, 0.2)';
+            document.getElementById('aiSelectedStyle').value = element.dataset.value;
+        }
+
+        // 更新字数统计
+        function updateCharCount() {
+            const plot = document.getElementById('aiStoryPlot').value;
+            document.getElementById('charCount').textContent = plot.length;
+            if (plot.length > 2000) {
+                document.getElementById('charCount').style.color = '#EF4444';
+            } else {
+                document.getElementById('charCount').style.color = '#94A3B8';
+            }
+        }
+
+        // 更新场景数量显示
+        function updateSceneCountValue(value) {
+            document.getElementById('sceneCountValue').textContent = value;
+        }
+
+        // AI生成故事
+        async function generateAIStory() {
+            const title = document.getElementById('aiStoryTitle').value.trim();
+            const genre = document.getElementById('aiSelectedGenre').value;
+            const plot = document.getElementById('aiStoryPlot').value.trim();
+            const sceneCount = document.getElementById('aiSceneCount').value;
+            const style = document.getElementById('aiSelectedStyle').value;
+
+            // 验证输入
+            if (!title) {
+                alert('请输入故事标题！');
+                return;
+            }
+            if (!genre) {
+                alert('请选择故事类型！');
+                return;
+            }
+            if (!plot) {
+                alert('请输入故事情节！');
+                return;
+            }
+            if (plot.length > 2000) {
+                alert('故事情节不能超过2000字！');
+                return;
+            }
+            if (!style) {
+                alert('请选择绘画风格！');
+                return;
+            }
+
+            // 检查金币（模拟）
+            const currentPoints = 1000; // 模拟用户金币
+            if (currentPoints < 100) {
+                alert('金币不足！需要100金币才能使用AI创作。');
+                return;
+            }
+
+            // 显示进度
+            const btn = document.getElementById('aiGenerateBtn');
+            const progressDiv = document.getElementById('aiProgress');
+            btn.disabled = true;
+            btn.textContent = '⏳ AI创作中...';
+            progressDiv.style.display = 'block';
+
+            // 模拟4步进度
+            const steps = [
+                { step: 1, width: '25%', delay: 1000 },
+                { step: 2, width: '50%', delay: 2000 },
+                { step: 3, width: '75%', delay: 3000 },
+                { step: 4, width: '100%', delay: 4000 }
+            ];
+
+            for (const s of steps) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                document.getElementById('progressBar').style.width = s.width;
+                document.getElementById(`step${s.step}`).querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+            }
+
+            // 生成完成
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = '🤖 使用豆包AI生成故事 (消耗100金币)';
+                progressDiv.style.display = 'none';
+                
+                // 重置进度条
+                document.getElementById('progressBar').style.width = '0%';
+                [1, 2, 3, 4].forEach(i => {
+                    document.getElementById(`step${i}`).querySelector('div').style.background = 'rgba(255,255,255,0.1)';
+                });
+                document.getElementById('step1').querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+
+                alert(`🎉 故事《${title}》生成完成！\n\n类型：${genre}\n场景数：${sceneCount}个\n风格：${getStyleName(style)}\n\n消耗：100金币`);
+                
+                // 跳转到阅读页面
+                readComic('comic1');
+            }, 500);
+        }
+
+        // 获取风格名称
+        function getStyleName(value) {
+            const styles = {
+                'anime': '日式动漫',
+                'realistic': '写实风格',
+                'pixel': '像素风格',
+                'watercolor': '水彩画风'
+            };
+            return styles[value] || value;
+        }
+
+        // 豆包AI API调用（实际实现）
+        async function callDoubaoAI(prompt, genre, sceneCount) {
+            const API_KEY = '73249e08-1d3e-49a3-9120-9ca1fe4d075e';
+            const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/responses';
+            
+            try {
+                const response = await fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "doubao-seed-2-0-pro-260215",
+                        input: [{
+                            role: "user",
+                            content: [{
+                                type: "input_text",
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API调用失败: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.output.choices[0].message.content[0].text;
+            } catch (error) {
+                console.error('豆包AI调用失败:', error);
+                return null;
+            }
+        }
     </script>
 </body>
 </html>
