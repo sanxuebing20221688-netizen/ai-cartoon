@@ -903,6 +903,31 @@
                     </div>
                 </div>
 
+                <!-- AI服务商选择 -->
+                <div class="create-section" style="margin-top: 20px;">
+                    <h3>🔧 AI服务商设置</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                        <button class="provider-btn active" id="provider-doubao" onclick="selectAIProvider('doubao')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #8B5CF6; background: rgba(139, 92, 246, 0.2); color: white; cursor: pointer;">
+                            🟡 豆包
+                        </button>
+                        <button class="provider-btn" id="provider-openai" onclick="selectAIProvider('openai')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #10B981; background: transparent; color: #10B981; cursor: pointer;">
+                            🟢 OpenAI
+                        </button>
+                        <button class="provider-btn" id="provider-claude" onclick="selectAIProvider('claude')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #F59E0B; background: transparent; color: #F59E0B; cursor: pointer;">
+                            🟠 Claude
+                        </button>
+                        <button class="provider-btn" id="provider-zhipu" onclick="selectAIProvider('zhipu')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #3B82F6; background: transparent; color: #3B82F6; cursor: pointer;">
+                            🔵 智谱AI
+                        </button>
+                        <button class="provider-btn" id="provider-qwen" onclick="selectAIProvider('qwen')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #EC4899; background: transparent; color: #EC4899; cursor: pointer;">
+                            🟣 通义千问
+                        </button>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85rem; color: #94A3B8;">
+                        当前使用: <span id="currentProvider" style="color: #8B5CF6; font-weight: 600;">豆包AI</span>
+                    </div>
+                </div>
+
                 <button class="btn-primary" onclick="generateAIStory()" id="aiGenerateBtn" style="width: 100%; padding: 16px; font-size: 1.1rem; margin-top: 20px;">
                     🤖 使用豆包AI生成故事 (消耗100金币)
                 </button>
@@ -1288,6 +1313,44 @@
             document.getElementById('aiSelectedStyle').value = element.dataset.value;
         }
 
+        // 选择AI服务商
+        let selectedProvider = 'doubao';
+        
+        function selectAIProvider(provider) {
+            const config = AI_PROVIDERS[provider];
+            
+            // 检查是否配置了API Key
+            if (!config.apiKey) {
+                alert(`${config.nameCn} 尚未配置API Key！\n\n请在控制台或设置页面配置API Key。\n\n提示：可以在localStorage中设置：\nlocalStorage.setItem('aiProviderConfig', JSON.stringify({\n  ${provider}: { apiKey: 'your-key', enabled: true }\n}))`);
+                return;
+            }
+            
+            selectedProvider = provider;
+            
+            // 更新按钮样式
+            document.querySelectorAll('.provider-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+            });
+            
+            const btn = document.getElementById(`provider-${provider}`);
+            btn.classList.add('active');
+            btn.style.background = `rgba(${provider === 'doubao' ? '139, 92, 246' : provider === 'openai' ? '16, 185, 129' : provider === 'claude' ? '245, 158, 11' : provider === 'zhipu' ? '59, 130, 246' : '236, 72, 153'}, 0.2)`;
+            
+            // 更新当前服务商显示
+            document.getElementById('currentProvider').textContent = config.nameCn;
+            
+            // 更新生成按钮文字
+            document.getElementById('aiGenerateBtn').textContent = `🤖 使用${config.nameCn}生成故事 (消耗100金币)`;
+            
+            // 启用该服务商
+            config.enabled = true;
+            activeAIProviders = [provider];
+            saveAIConfig();
+            
+            console.log(`[AI] 已切换到 ${config.nameCn}`);
+        }
+
         // 更新字数统计
         function updateCharCount() {
             const plot = document.getElementById('aiStoryPlot').value;
@@ -1359,12 +1422,13 @@
                 // 步骤3: 构建场景（75%）- 调用API
                 await updateProgress(3, '75%', '正在构建场景...');
                 
-                // 调用豆包AI（带限流控制）
+                // 调用AI（多服务商自动切换）
                 const referenceImages = getReferenceImagesForAI();
                 let storyData = null;
                 
                 try {
-                    const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount, referenceImages);
+                    // 使用多AI服务商调用（自动降级）
+                    const aiResponse = await callAIWithFallback(plot, genre, sceneCount, referenceImages);
                     
                     // 步骤4: 生成对话（100%）
                     await updateProgress(4, '100%', '正在生成对话...');
@@ -2286,6 +2350,331 @@ ${referenceHint}
             
             return keywords;
         }
+
+        // ========== 多AI服务商接入系统 ==========
+        
+        // AI服务商配置
+        const AI_PROVIDERS = {
+            // 豆包 (火山引擎) - 默认
+            doubao: {
+                name: '豆包',
+                nameCn: '豆包AI',
+                endpoint: 'https://ark.cn-beijing.volces.com/api/v3/responses',
+                model: 'doubao-seed-2-0-pro-260215',
+                apiKey: '73249e08-1d3e-49a3-9120-9ca1fe4d075e',
+                enabled: true,
+                supportsImages: true,
+                maxRetries: 3,
+                timeout: 30000
+            },
+            // OpenAI
+            openai: {
+                name: 'OpenAI',
+                nameCn: 'ChatGPT',
+                endpoint: 'https://api.openai.com/v1/chat/completions',
+                model: 'gpt-3.5-turbo',
+                apiKey: '', // 用户需要配置
+                enabled: false,
+                supportsImages: false,
+                maxRetries: 3,
+                timeout: 30000
+            },
+            // Claude (Anthropic)
+            claude: {
+                name: 'Claude',
+                nameCn: 'Claude',
+                endpoint: 'https://api.anthropic.com/v1/messages',
+                model: 'claude-3-haiku-20240307',
+                apiKey: '', // 用户需要配置
+                enabled: false,
+                supportsImages: false,
+                maxRetries: 3,
+                timeout: 30000
+            },
+            // 智谱AI
+            zhipu: {
+                name: 'ZhipuAI',
+                nameCn: '智谱AI',
+                endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+                model: 'glm-4',
+                apiKey: '', // 用户需要配置
+                enabled: false,
+                supportsImages: false,
+                maxRetries: 3,
+                timeout: 30000
+            },
+            // 阿里通义千问
+            qwen: {
+                name: 'Qwen',
+                nameCn: '通义千问',
+                endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+                model: 'qwen-turbo',
+                apiKey: '', // 用户需要配置
+                enabled: false,
+                supportsImages: false,
+                maxRetries: 3,
+                timeout: 30000
+            }
+        };
+
+        // 当前活跃的AI服务商（按优先级排序）
+        let activeAIProviders = ['doubao'];
+
+        // 加载AI配置
+        function loadAIConfig() {
+            const config = localStorage.getItem('aiProviderConfig');
+            if (config) {
+                try {
+                    const parsed = JSON.parse(config);
+                    Object.keys(parsed).forEach(key => {
+                        if (AI_PROVIDERS[key]) {
+                            AI_PROVIDERS[key].apiKey = parsed[key].apiKey || '';
+                            AI_PROVIDERS[key].enabled = parsed[key].enabled || false;
+                        }
+                    });
+                } catch (e) {
+                    console.error('加载AI配置失败:', e);
+                }
+            }
+            
+            // 更新活跃提供商
+            activeAIProviders = Object.keys(AI_PROVIDERS).filter(k => 
+                AI_PROVIDERS[k].enabled && AI_PROVIDERS[k].apiKey
+            );
+            
+            // 如果没有启用的，保留豆包
+            if (activeAIProviders.length === 0) {
+                activeAIProviders = ['doubao'];
+                AI_PROVIDERS.doubao.enabled = true;
+            }
+            
+            console.log('[AI] 当前活跃服务商:', activeAIProviders.map(p => AI_PROVIDERS[p].nameCn));
+        }
+
+        // 保存AI配置
+        function saveAIConfig() {
+            const config = {};
+            Object.keys(AI_PROVIDERS).forEach(key => {
+                config[key] = {
+                    apiKey: AI_PROVIDERS[key].apiKey,
+                    enabled: AI_PROVIDERS[key].enabled
+                };
+            });
+            localStorage.setItem('aiProviderConfig', JSON.stringify(config));
+        }
+
+        // 多AI调用（带自动降级）
+        async function callAIWithFallback(prompt, genre, sceneCount, referenceImages = []) {
+            let lastError = null;
+            
+            for (const provider of activeAIProviders) {
+                try {
+                    console.log(`[AI] 尝试使用 ${AI_PROVIDERS[provider].nameCn}...`);
+                    const result = await callAIProvider(provider, prompt, genre, sceneCount, referenceImages);
+                    console.log(`[AI] ${AI_PROVIDERS[provider].nameCn} 调用成功!`);
+                    return result;
+                } catch (error) {
+                    console.error(`[AI] ${AI_PROVIDERS[provider].nameCn} 调用失败:`, error.message);
+                    lastError = error;
+                    
+                    // 如果是限流错误，尝试下一个
+                    if (error.status === 429 || error.code === 'rate_limit_error') {
+                        console.log(`[AI] 触发限流，切换到下一个服务商...`);
+                        continue;
+                    }
+                    
+                    // 其他错误也继续尝试下一个
+                    continue;
+                }
+            }
+            
+            // 所有提供商都失败
+            console.error('[AI] 所有AI服务商都失败');
+            throw lastError || new Error('所有AI服务商都失败');
+        }
+
+        // 调用指定AI服务商
+        async function callAIProvider(provider, prompt, genre, sceneCount, referenceImages = []) {
+            const config = AI_PROVIDERS[provider];
+            if (!config.enabled || !config.apiKey) {
+                throw new Error(`${config.nameCn} 未启用或未配置API Key`);
+            }
+            
+            switch (provider) {
+                case 'doubao':
+                    return await callDoubaoAPI_v2(prompt, genre, sceneCount, referenceImages, config);
+                case 'openai':
+                    return await callOpenAIAPI(prompt, genre, sceneCount, config);
+                case 'claude':
+                    return await callClaudeAPI(prompt, genre, sceneCount, config);
+                case 'zhipu':
+                    return await callZhipuAPI(prompt, genre, sceneCount, config);
+                case 'qwen':
+                    return await callQwenAPI(prompt, genre, sceneCount, config);
+                default:
+                    throw new Error(`未知AI服务商: ${provider}`);
+            }
+        }
+
+        // ========== 各AI服务商API实现 ==========
+        
+        // 豆包API v2
+        async function callDoubaoAPI_v2(prompt, genre, sceneCount, referenceImages, config) {
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, referenceImages.length > 0);
+            
+            const content = [{ type: "input_text", text: optimizedPrompt }];
+            
+            if (referenceImages && referenceImages.length > 0) {
+                referenceImages.forEach(img => content.push(img));
+            }
+
+            const response = await fetchWithTimeout(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    input: [{ role: "user", content: content }]
+                })
+            }, config.timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw { status: response.status, code: 'doubao_error', message: errorText.substring(0, 200) };
+            }
+
+            const data = await response.json();
+            return data.output?.choices?.[0]?.message?.content?.[0]?.text || '';
+        }
+
+        // OpenAI API
+        async function callOpenAIAPI(prompt, genre, sceneCount, config) {
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+
+            const response = await fetchWithTimeout(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: [{ role: "user", content: optimizedPrompt }],
+                    temperature: 0.7
+                })
+            }, config.timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw { status: response.status, code: 'openai_error', message: errorText.substring(0, 200) };
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '';
+        }
+
+        // Claude API
+        async function callClaudeAPI(prompt, genre, sceneCount, config) {
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+
+            const response = await fetchWithTimeout(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': config.apiKey,
+                    'anthropic-version': '2023-06-01'
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: [{ role: "user", content: optimizedPrompt }],
+                    max_tokens: 1024
+                })
+            }, config.timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw { status: response.status, code: 'claude_error', message: errorText.substring(0, 200) };
+            }
+
+            const data = await response.json();
+            return data.content?.[0]?.text || '';
+        }
+
+        // 智谱AI API
+        async function callZhipuAPI(prompt, genre, sceneCount, config) {
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+
+            const response = await fetchWithTimeout(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: [{ role: "user", content: optimizedPrompt }]
+                })
+            }, config.timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw { status: response.status, code: 'zhipu_error', message: errorText.substring(0, 200) };
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '';
+        }
+
+        // 通义千问 API
+        async function callQwenAPI(prompt, genre, sceneCount, config) {
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+
+            const response = await fetchWithTimeout(config.endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model,
+                    messages: [{ role: "user", content: optimizedPrompt }]
+                })
+            }, config.timeout);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw { status: response.status, code: 'qwen_error', message: errorText.substring(0, 200) };
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '';
+        }
+
+        // 带超时的fetch
+        async function fetchWithTimeout(url, options, timeout = 30000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw { status: 408, code: 'timeout', message: '请求超时' };
+                }
+                throw error;
+            }
+        }
+
+        // 初始化时加载AI配置
+        loadAIConfig();
     </script>
 </body>
 </html>
