@@ -903,7 +903,7 @@
                     </div>
                 </div>
 
-                <!-- AI服务商选择 -->
+                <!-- AI服务商设置 -->
                 <div class="create-section" style="margin-top: 20px;">
                     <h3>🔧 AI服务商设置</h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; align-items: center;">
@@ -1143,15 +1143,34 @@
 
         // 页面切换
         function showPage(pageId) {
+            console.log('[页面切换] 尝试切换到:', pageId);
+            
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
 
-            document.getElementById(pageId).classList.add('active');
-            event?.target?.classList?.add('active');
+            const targetPage = document.getElementById(pageId);
+            const targetLink = document.querySelector(`.nav-link[onclick*="showPage('${pageId}')"]`);
+            
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('[页面切换] 页面元素已激活:', pageId);
+            } else {
+                console.error('[页面切换] 未找到页面元素:', pageId);
+            }
+            
+            if (targetLink) {
+                targetLink.classList.add('active');
+                console.log('[页面切换] 导航链接已激活:', pageId);
+            } else {
+                console.error('[页面切换] 未找到导航链接:', pageId);
+            }
 
             if (pageId === 'browse') {
                 renderComicList('all');
             }
+            
+            // 添加调试信息
+            console.log('[页面切换] 切换完成，当前页面:', document.querySelector('.page.active')?.id);
         }
 
         // 选择故事类型
@@ -1918,12 +1937,15 @@
 
         // ========== 限流控制模块 ==========
         // 令牌桶算法 - 控制QPS在5-10之间
+        // 建议配置：capacity=5-10, refillRate=capacity
         class TokenBucket {
             constructor(capacity = 5, refillRate = 5) {
                 this.capacity = capacity;      // 桶容量（最大QPS）
                 this.tokens = capacity;        // 当前令牌数
-                this.refillRate = refillRate;  // 每秒补充令牌数
+                this.refillRate = refillRate; // 每秒补充令牌数
                 this.lastRefill = Date.now();  // 上次补充时间
+                
+                console.log(`[限流] 令牌桶初始化: 容量=${capacity}, 补充率=${refillRate} QPS`);
             }
 
             // 获取令牌
