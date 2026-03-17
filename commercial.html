@@ -818,7 +818,7 @@
         // ========== 评分系统 ==========
         function renderRating(storyId) {
             const ratings = currentUser?.ratings[storyId] || {};
-            const avg = ratings.ratings.length > 0 ? (ratings.ratings.reduce((a,b)=>a+b,0)/ratings.ratings.length : 0;
+            const avg = ratings.ratings.length > 0 ? (ratings.ratings.reduce((a,b)=>a+b,0)/ratings.ratings.length) : 0;
             const stars = [1,2,3,4,5];
             const container = document.querySelector('.comments-section .rating-display');
             container.innerHTML = stars.map(s => `<div class="star ${s <= avg ? 'active' : ''}">★</div>`).join('');
