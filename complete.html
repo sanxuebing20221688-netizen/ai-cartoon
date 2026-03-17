@@ -1822,126 +1822,453 @@ ${referenceHint}
         }
 
         // 模板生成故事（API失败时的fallback）
+        // 丰富的故事模板数据
+        const STORY_TEMPLATES = {
+            '恋爱': {
+                genre: '💕 甜蜜恋爱',
+                scenes: [
+                    { panel: '🏫', setting: '阳光明媚的校园，樱花纷飞', dialogues: [
+                        {speaker: '旁白', text: '转学生第一天，你走进教室，阳光洒在课桌上'},
+                        {speaker: '主角', text: '（新班级...不知道会不会交到新朋友）'},
+                        {speaker: '女主', text: '同学，这个位置有人吗？'}
+                    ], choices: [
+                        {text: '😊 友善回应', next: 2},
+                        {text: '😌 点头示意', next: 2}
+                    ]},
+                    { panel: '☕', setting: '校园咖啡厅，温馨午后', dialogues: [
+                        {speaker: '女主', text: '原来你也喜欢这本书！'},
+                        {speaker: '主角', text: '是啊，这本的作者是我的最爱'},
+                        {speaker: '女主', text: '太巧了！我请你喝咖啡吧'}
+                    ], choices: [
+                        {text: '❤️ 欣然接受', next: 3},
+                        {text: '😳 礼貌拒绝', next: 3}
+                    ]},
+                    { panel: '🌸', setting: '樱花树下，浪漫时刻', dialogues: [
+                        {speaker: '主角', text: '今天的樱花...真美'},
+                        {speaker: '女主', text: '和你一起看，更美'},
+                        {speaker: '主角', text: '（心跳加速...）'}
+                    ], choices: [
+                        {text: '💕 表白', next: 4},
+                        {text: '😊 保持沉默', next: 4}
+                    ]},
+                    { panel: '💍', setting: '多年后，回忆涌上心头', dialogues: [
+                        {speaker: '旁白', text: '如果当初做了不同的选择...'},
+                        {speaker: '主角', text: '但我相信，缘分让我们相遇'},
+                        {speaker: '女主', text: '无论在哪里，我都会等你'}
+                    ], ending: '💕 甜蜜恋曲结局'},
+                    { panel: '💑', setting: '幸福的起点', dialogues: [
+                        {speaker: '主角', text: '谢谢你出现在我的生命里'},
+                        {speaker: '女主', text: '这是我们的开始'},
+                        {speaker: '旁白', text: '爱情就像樱花，绽放时最美'}
+                    ], ending: '💑 幸福终点站'}
+                ]
+            },
+            '悬疑': {
+                genre: '🔍 惊悚悬疑',
+                scenes: [
+                    { panel: '🌙', setting: '深夜的废弃工厂，月光透过破窗', dialogues: [
+                        {speaker: '旁白', text: '你收到一封神秘信件，来到这荒废已久的地方'},
+                        {speaker: '主角', text: '（是谁把我叫到这里...）'},
+                        {speaker: '神秘人', text: '你来了'}
+                    ], choices: [
+                        {text: '🔦 打开手电', next: 2},
+                        {text: '👀 保持隐蔽', next: 2}
+                    ]},
+                    { panel: '🗝️', setting: '地下密室，阴暗潮湿', dialogues: [
+                        {speaker: '主角', text: '这些是...过去的档案？'},
+                        {speaker: '神秘人', text: '你父亲留下的秘密'},
+                        {speaker: '主角', text: '他到底隐瞒了什么？'}
+                    ], choices: [
+                        {text: '📖 继续阅读', next: 3},
+                        {text: '📁 带走文件', next: 3}
+                    ]},
+                    { panel: '🔔', setting: '真相即将揭晓', dialogues: [
+                        {speaker: '旁白', text: '每一个线索都指向一个惊人的真相'},
+                        {speaker: '主角', text: '原来...我一直在追寻的就在身边'},
+                        {speaker: '神秘人', text: '你准备好了吗？'}
+                    ], choices: [
+                        {text: '💪 面对真相', next: 4},
+                        {text: '😰 逃避', next: 4}
+                    ]},
+                    { panel: '🎭', setting: '多重身份的游戏', dialogues: [
+                        {speaker: '主角', text: '每个人都戴着面具'},
+                        {speaker: '神秘人', text: '包括你自己'},
+                        {speaker: '旁白', text: '当迷雾散去，真相往往更加残酷'}
+                    ], ending: '❓ 真相大白结局'},
+                    { panel: '🌟', setting: '新的开始', dialogues: [
+                        {speaker: '主角', text: '无论过去如何，我选择向前看'},
+                        {speaker: '旁白', text: '有些谜题永远没有答案...但生活还要继续'},
+                        {speaker: '主角', text: '再见了，过去'}
+                    ], ending: '🌅 新的黎明结局'}
+                ]
+            },
+            '玄幻': {
+                genre: '🐉 奇幻修仙',
+                scenes: [
+                    { panel: '🌀', setting: '异世界入口，漩涡旋转', dialogues: [
+                        {speaker: '旁白', text: '一道光芒闪过，你来到了陌生的世界'},
+                        {speaker: '主角', text: '这是...哪里？'},
+                        {speaker: '系统', text: '欢迎来到修仙界'}
+                    ], choices: [
+                        {text: '🏃 向前探索', next: 2},
+                        {text: '👀 观察四周', next: 2}
+                    ]},
+                    { panel: '⛰️', setting: '仙山之巅，云雾缭绕', dialogues: [
+                        {speaker: '老者', text: '少年，我看你骨骼清奇'},
+                        {speaker: '主角', text: '老人家，这是哪里？'},
+                        {speaker: '老者', text: '此地乃青云仙宗'}
+                    ], choices: [
+                        {text: '🙇 拜师学艺', next: 3},
+                        {text: '❓ 询问详情', next: 3}
+                    ]},
+                    { panel: '⚔️', setting: '秘境试炼，生死考验', dialogues: [
+                        {speaker: '旁白', text: '秘境中危机四伏，各路天才齐聚一堂'},
+                        {speaker: '主角', text: '（必须变强才能回去）'},
+                        {speaker: '对手', text: '就凭你？'}
+                    ], choices: [
+                        {text: '💪 全力一战', next: 4},
+                        {text: '🧠 智取', next: 4}
+                    ]},
+                    { panel: '🐉', setting: '神龙现世，天地变色', dialogues: [
+                        {speaker: '神龙', text: '千年等待，终于等到你'},
+                        {speaker: '主角', text: '你是...？'},
+                        {speaker: '神龙', text: '我是你的守护灵兽'}
+                    ], ending: '🐉 神兽认主结局'},
+                    { panel: '✨', setting: '飞升成仙，俯瞰众生', dialogues: [
+                        {speaker: '主角', text: '历经万难，终于站在这里'},
+                        {speaker: '旁白', text: '修仙之路漫长，但终点就在眼前'},
+                        {speaker: '主角', text: '继续前行'}
+                    ], ending: '✨ 飞升仙界结局'}
+                ]
+            },
+            '科幻': {
+                genre: '🚀 星际科幻',
+                scenes: [
+                    { panel: '🌌', setting: '星际航道，星光璀璨', dialogues: [
+                        {speaker: '舰长', text: '前方发现未知信号'},
+                        {speaker: '主角', text: '坐标是多少？'},
+                        {speaker: 'AI', text: '正在分析...来源未知'}
+                    ], choices: [
+                        {text: '🚀 前往查看', next: 2},
+                        {text: '⚠️ 保持警惕', next: 2}
+                    ]},
+                    { panel: '🛸', setting: '外星飞船，神秘文明', dialogues: [
+                        {speaker: '主角', text: '这是...外星文明？'},
+                        {speaker: '外星生物', text: '#@%&*（翻译中...）'},
+                        {speaker: 'AI', text: '检测到友好信号'}
+                    ], choices: [
+                        {text: '🤝 尝试交流', next: 3},
+                        {text: '🔫 准备武器', next: 3}
+                    ]},
+                    { panel: '🌍', setting: '返回地球or留在太空', dialogues: [
+                        {speaker: '主角', text: '这里有太多未知'},
+                        {speaker: '队友', text: '但也是机会'},
+                        {speaker: '主角', text: '我们面临的...是人类的未来'}
+                    ], choices: [
+                        {text: '🌏 返回地球', next: 4},
+                        {text: '🔭 继续探索', next: 4}
+                    ]},
+                    { panel: '🌟', setting: '新文明的诞生', dialogues: [
+                        {speaker: '旁白', text: '人类文明翻开了新篇章'},
+                        {speaker: '主角', text: '这是我们的使命'},
+                        {speaker: '后人', text: '谢谢你们'}
+                    ], ending: '🌟 星际文明结局'},
+                    { panel: '💫', setting: '永恒的星海', dialogues: [
+                        {speaker: '主角', text: '宇宙如此广阔'},
+                        {speaker: '旁白', text: '而探索永无止境'},
+                        {speaker: '主角', text: '我们的旅程才刚开始'}
+                    ], ending: '🚀 星辰大海结局'}
+                ]
+            },
+            '恐怖': {
+                genre: '👻 惊悚恐怖',
+                scenes: [
+                    { panel: '🏚️', setting: '废弃古宅，大门紧闭', dialogues: [
+                        {speaker: '旁白', text: '你收到一封匿名信，来到这座传说中的凶宅'},
+                        {speaker: '主角', text: '（为什么是我...）'},
+                        {speaker: '声音', text: '你...来了'}
+                    ], choices: [
+                        {text: '🔦 打开手电', next: 2},
+                        {text: '👂 聆听声音', next: 2}
+                    ]},
+                    { panel: '🕯️', setting: '昏暗客厅，烛光摇曳', dialogues: [
+                        {speaker: '主角', text: '有什么东西...在那里'},
+                        {speaker: '幽灵', text: '我的...仇...报...'},
+                        {speaker: '主角', text: '（必须找到真相）'}
+                    ], choices: [
+                        {text: '📖 调查真相', next: 3},
+                        {text: '🏃 立刻逃跑', next: 3}
+                    ]},
+                    { panel: '🚪', setting: '密室逃脱，生死一线', dialogues: [
+                        {speaker: '旁白', text: '门后...是更深的恐惧'},
+                        {speaker: '主角', text: '没有回头路了'},
+                        {speaker: '恶灵', text: '永远...留下来...'}
+                    ], choices: [
+                        {text: '💪 反抗', next: 4},
+                        {text: '🙏 祈求', next: 4}
+                    ]},
+                    { panel: '💀', setting: '真相or死亡', dialogues: [
+                        {speaker: '主角', text: '原来...一切都是循环'},
+                        {speaker: '恶灵', text: '你逃不掉的'},
+                        {speaker: '旁白', text: '当恐惧达到顶峰...'}
+                    ], ending: '💀 恐怖终局'},
+                    { panel: '🌅', setting: '黎明or永夜', dialogues: [
+                        {speaker: '主角', text: '天...亮了'},
+                        {speaker: '旁白', text: '但阴影仍在'},
+                        {speaker: '主角', text: '我会回来面对一切'}
+                    ], ending: '🌅 黎明重生结局'}
+                ]
+            },
+            '搞笑': {
+                genre: '😂 轻松搞笑',
+                scenes: [
+                    { panel: '😱', setting: '周一早晨，闹钟迟到', dialogues: [
+                        {speaker: '闹钟', text: '叮叮叮！！！'},
+                        {speaker: '主角', text: '（再睡5分钟...）'},
+                        {speaker: '旁白', text: '结果迟到了2小时'}
+                    ], choices: [
+                        {text: '😂 假装生病', next: 2},
+                        {text: '😅 诚实道歉', next: 2}
+                    ]},
+                    { panel: '💼', setting: '公司会议室', dialogues: [
+                        {speaker: '老板', text: '这个方案谁做的？'},
+                        {speaker: '主角', text: '（是我...）'},
+                        {speaker: '同事', text: '我帮他一起做的！'}
+                    ], choices: [
+                        {text: '😆 感激', next: 3},
+                        {text: '😂 默认', next: 3}
+                    ]},
+                    { panel: '🍜', setting: '公司楼下的网红餐厅', dialogues: [
+                        {speaker: '主角', text: '终于排到了！'},
+                        {speaker: '服务员', text: '对不起，今天已售罄'},
+                        {speaker: '主角', text: '（心态崩了）'}
+                    ], choices: [
+                        {text: '🤣 换一家', next: 4},
+                        {text: '😤 继续等', next: 4}
+                    ]},
+                    { panel: '🎉', setting: '意外惊喜', dialogues: [
+                        {speaker: '朋友', text: 'Surprise！'},
+                        {speaker: '主角', text: '你们...'},
+                        {speaker: '旁白', text: '反转来得太快'}
+                    ], ending: '🎊 欢乐结局'},
+                    { panel: '🌙', setting: '睡前反思', dialogues: [
+                        {speaker: '主角', text: '今天也太魔幻了吧'},
+                        {speaker: '旁白', text: '这就是生活'},
+                        {speaker: '主角', text: '明天会更好...吧'}
+                    ], ending: '😴 平静入睡结局'}
+                ]
+            },
+            '霸宠': {
+                genre: '👑 豪门总裁',
+                scenes: [
+                    { panel: '🚗', setting: '豪华加长林肯车', dialogues: [
+                        {speaker: '管家', text: '小姐，请上车'},
+                        {speaker: '女主', text: '这是去哪里？'},
+                        {speaker: '总裁', text: '当然是...我家'}
+                    ], choices: [
+                        {text: '😰 拒绝', next: 2},
+                        {text: '😤 无奈上车', next: 2}
+                    ]},
+                    { panel: '🏰', setting: '奢华别墅，金碧辉煌', dialogues: [
+                        {speaker: '女主', text: '你家...好大'},
+                        {speaker: '总裁', text: '以后也是你的家'},
+                        {speaker: '女主', text: '谁答应你了！'}
+                    ], choices: [
+                        {text: '💕 渐渐心动', next: 3},
+                        {text: '😠 生气', next: 3}
+                    ]},
+                    { panel: '💼', setting: '公司危机', dialogues: [
+                        {speaker: '总裁', text: '只有你能帮我'},
+                        {speaker: '女主', text: '为什么是我？'},
+                        {speaker: '总裁', text: '因为你是特别的'}
+                    ], choices: [
+                        {text: '❤️ 答应帮忙', next: 4},
+                        {text: '😏 谈条件', next: 4}
+                    ]},
+                    { panel: '💍', setting: '浪漫求婚', dialogues: [
+                        {speaker: '总裁', text: '嫁给我'},
+                        {speaker: '女主', text: '你...这是求婚？'},
+                        {speaker: '旁白', text: '霸道总裁的甜宠日常'}
+                    ], ending: '💍 霸总甜宠结局'},
+                    { panel: '👨‍👩‍👧', setting: '幸福的家', dialogues: [
+                        {speaker: '女主', text: '谢谢你爱我'},
+                        {speaker: '总裁', text: '永远别离开我'},
+                        {speaker: '旁白', text: '童话般的结局'}
+                    ], ending: '💕 幸福终点结局'}
+                ]
+            },
+            '穿越': {
+                genre: '🌀 时空穿越',
+                scenes: [
+                    { panel: '⚡', setting: '现代城市，雷电交错', dialogues: [
+                        {speaker: '主角', text: '那道雷...不对劲！'},
+                        {speaker: '旁白', text: '瞬间，天旋地转'},
+                        {speaker: '系统', text: '穿越程序启动'}
+                    ], choices: [
+                        {text: '👀 睁开眼睛', next: 2},
+                        {text: '😰 尖叫', next: 2}
+                    ]},
+                    { panel: '🏯', setting: '古代京城，繁华街道', dialogues: [
+                        {speaker: '古人', text: '这是哪家的小姐？'},
+                        {speaker: '主角', text: '（穿越了？！）'},
+                        {speaker: '公子', text: '姑娘，你还好吗？'}
+                    ], choices: [
+                        {text: '😊 礼貌回应', next: 3},
+                        {text: '😰 逃跑', next: 3}
+                    ]},
+                    { panel: '📜', setting: '皇宫大殿，波涛汹涌', dialogues: [
+                        {speaker: '皇帝', text: '你有何才能？'},
+                        {speaker: '主角', text: '（用现代知识...）'},
+                        {speaker: '大臣', text: '此女非凡'}
+                    ], choices: [
+                        {text: '🎯 展示才艺', next: 4},
+                        {text: '🙇 低调行事', next: 4}
+                    ]},
+                    { panel: '👑', setting: '权倾天下', dialogues: [
+                        {speaker: '旁白', text: '从一个普通人，到权倾天下'},
+                        {speaker: '主角', text: '这是我的时代'},
+                        {speaker: '爱人', text: '无论在哪里，我都会陪你'}
+                    ], ending: '👑 女皇天下结局'},
+                    { panel: '🌀', setting: '回到现代or留在古代', dialogues: [
+                        {speaker: '主角', text: '两个世界，两段人生'},
+                        {speaker: '旁白', text: '选择权在你手中'},
+                        {speaker: '主角', text: '我选择...'}
+                    ], ending: '🌟 传奇人生结局'}
+                ]
+            },
+            '武侠': {
+                genre: '⚔️ 江湖侠义',
+                scenes: [
+                    { panel: '🏔️', setting: '华山之巅，云雾缭绕', dialogues: [
+                        {speaker: '师父', text: '今日是你出师之日'},
+                        {speaker: '徒弟', text: '弟子谨记师父教诲'},
+                        {speaker: '师父', text: '去吧，行侠仗义'}
+                    ], choices: [
+                        {text: '🙇 拜别', next: 2},
+                        {text: '💪 立誓', next: 2}
+                    ]},
+                    { panel: '🏮', setting: '江湖客栈，风波四起', dialogues: [
+                        {speaker: '小二', text: '客官，打尖还是住店？'},
+                        {speaker: '反派', text: '把值钱的东西交出来！'},
+                        {speaker: '主角', text: '路见不平'}
+                    ], choices: [
+                        {text: '⚔️ 出手相助', next: 3},
+                        {text: '👀 暗中观察', next: 3}
+                    ]},
+                    { panel: '🔪', setting: '生死决战', dialogues: [
+                        {speaker: '反派', text: '就凭你？'},
+                        {speaker: '主角', text: '邪不胜正'},
+                        {speaker: '旁白', text: '剑光闪过...'}
+                    ], choices: [
+                        {text: '💀 击杀', next: 4},
+                        {text: '🙏 放过', next: 4}
+                    ]},
+                    { panel: '🏆', setting: '武林盟主大会', dialogues: [
+                        {speaker: '主持', text: '新任盟主是...'},
+                        {speaker: '主角', text: '（没想到）'},
+                        {speaker: '众人', text: '参见盟主！'}
+                    ], ending: '🏆 武林盟主结局'},
+                    { panel: '🌸', setting: '归隐山林', dialogues: [
+                        {speaker: '主角', text: '江湖路远，后会有期'},
+                        {speaker: '爱人', text: '与你一起，浪迹天涯'},
+                        {speaker: '旁白', text: '侠客的最终归宿'}
+                    ], ending: '🌸 归隐江湖结局'}
+                ]
+            }
+        };
+
         function generateTemplateStory(plot, genre, sceneCount) {
             // 提取关键词
             const keywords = extractKeywordsFromPlot(plot);
             
-            // 类型模板
-            const templates = {
-                '恋爱': {
-                    panels: ['💕', '☕', '🌙', '🌹', '💍'],
-                    dialogues: [
-                        [{speaker: '主角', text: keywords.action || '偶然相遇'}],
-                        [{speaker: '对方', text: '你好'}],
-                        [{speaker: '主角', text: '很高兴认识你'}]
-                    ]
-                },
-                '悬疑': {
-                    panels: ['🔍', '🏚️', '👤', '🩸', '❓'],
-                    dialogues: [
-                        [{speaker: '旁白', text: keywords.setting || '深夜的废弃工厂'}],
-                        [{speaker: '主角', text: '谁在那里？'}],
-                        [{speaker: '神秘人', text: '你终于来了'}]
-                    ]
-                },
-                '玄幻': {
-                    panels: ['🐉', '⚡', '🏰', '💎', '✨'],
-                    dialogues: [
-                        [{speaker: '旁白', text: '异世界的大门开启'}],
-                        [{speaker: '主角', text: '这是哪里？'}],
-                        [{speaker: '导师', text: '欢迎来到修仙世界'}]
-                    ]
-                },
-                '科幻': {
-                    panels: ['🚀', '🌌', '👽', '🛸', '🌍'],
-                    dialogues: [
-                        [{speaker: '舰长', text: '发现新星球！'}],
-                        [{speaker: '主角', text: '准备登陆'}],
-                        [{speaker: 'AI', text: '生命迹象确认'}]
-                    ]
-                },
-                '恐怖': {
-                    panels: ['👻', '🕯️', '🚪', '🩸', '💀'],
-                    dialogues: [
-                        [{speaker: '旁白', text: '深夜的古老宅邸'}],
-                        [{speaker: '主角', text: '什么声音？'}],
-                        [{speaker: '鬼魂', text: '滚出去！'}]
-                    ]
-                },
-                '搞笑': {
-                    panels: ['😂', '😅', '😆', '🤣', '💀'],
-                    dialogues: [
-                        [{speaker: '主角', text: '今天也太倒霉了吧'}],
-                        [{speaker: '朋友', text: '哈哈哈'}],
-                        [{speaker: '主角', text: '笑什么笑'}]
-                    ]
-                },
-                '霸宠': {
-                    panels: ['👑', '💼', '🏠', '💕', '💍'],
-                    dialogues: [
-                        [{speaker: '总裁', text: '女人，你引起了我的注意'}],
-                        [{speaker: '女主', text: '放开我！'}],
-                        [{speaker: '总裁', text: '你是我的'}]
-                    ]
-                },
-                '穿越': {
-                    panels: ['🌀', '⚡', '🏯', '👘', '🎌'],
-                    dialogues: [
-                        [{speaker: '系统', text: '穿越成功！'}],
-                        [{speaker: '主角', text: '这是哪里？'}],
-                        [{speaker: '古人', text: '你是何人？'}]
-                    ]
-                },
-                '武侠': {
-                    panels: ['⚔️', '🏔️', '🥋', '📜', '🏆'],
-                    dialogues: [
-                        [{speaker: '师父', text: '今日教你本门绝学'}],
-                        [{speaker: '徒弟', text: '弟子受教'}],
-                        [{speaker: '师父', text: '去吧，行侠仗义'}]
-                    ]
-                }
-            };
-
-            const template = templates[genre] || templates['恋爱'];
-            const scenes = [];
+            // 获取对应类型的模板
+            const template = STORY_TEMPLATES[genre] || STORY_TEMPLATES['恋爱'];
+            const templateScenes = template.scenes;
             
-            for (let i = 0; i < sceneCount; i++) {
-                const isLast = i === sceneCount - 1;
-                const scene = {
-                    scene: i + 1,
-                    setting: `场景${i+1}: ${template.panels[i % template.panels.length]} ${keywords.setting || '开始'}`.substring(0, 50),
-                    dialogues: template.dialogues[i % template.dialogues.length].map(d => ({
-                        speaker: d.speaker,
-                        text: d.text
-                    }))
-                };
+            // 根据请求的场景数量截取
+            const scenes = [];
+            for (let i = 0; i < Math.min(sceneCount, templateScenes.length); i++) {
+                const scene = {...templateScenes[i]};
                 
-                if (!isLast) {
-                    scene.choices = [
-                        {text: '🔵 选项A', next: i + 2},
-                        {text: '🔴 选项B', next: i + 2}
-                    ];
-                } else {
-                    scene.ending = genre + '结局';
+                // 将用户输入的情节融入
+                if (keywords.main) {
+                    scene.dialogues = scene.dialogues.map(d => ({
+                        ...d,
+                        text: d.text.replace('...', keywords.main.substring(0, 10))
+                    }));
+                }
+                
+                // 如果不是最后一个场景，需要调整next
+                if (i < Math.min(sceneCount, templateScenes.length) - 1) {
+                    if (scene.choices) {
+                        scene.choices = scene.choices.map((c, idx) => ({
+                            ...c,
+                            next: i + 2
+                        }));
+                    }
                 }
                 
                 scenes.push(scene);
             }
             
+            // 如果场景数少于模板，添加结局
+            if (scenes.length > 0 && !scenes[scenes.length-1].ending) {
+                const lastTemplateScene = templateScenes[templateScenes.length - 1];
+                scenes.push({
+                    panel: '🌟',
+                    setting: '故事结局',
+                    dialogues: lastTemplateScene.dialogues,
+                    ending: lastTemplateScene.ending
+                });
+            }
+            
             return { scenes };
         }
 
-        // 从情节中提取关键词
+        // 增强版关键词提取
         function extractKeywordsFromPlot(plot) {
             const keywords = {
+                main: plot.substring(0, 50),
                 location: '',
                 action: '',
-                target: ''
+                target: '',
+                mood: ''
             };
             
-            const locations = ['校园', '图书馆', '咖啡厅', '城市', '乡村', '古堡', '太空', '深海', '山村', '皇宫'];
-            const actions = ['相遇', '重逢', '逃跑', '战斗', '学习', '成长', '冒险', '探索', '拯救'];
-            const targets = ['她', '他', '神秘人', '导师', '敌人', '伙伴'];
+            const locations = [
+                '校园', '学校', '图书馆', '咖啡厅', '城市', '乡村', '古堡', '城堡',
+                '太空', '宇宙', '深海', '海底', '山村', '农村', '皇宫', '朝廷',
+                '江湖', '山林', '沙漠', '森林', '小镇', '都市', '大厦', '公司'
+            ];
+            const actions = [
+                '相遇', '重逢', '逃跑', '战斗', '学习', '成长', '冒险', '探索',
+                '拯救', '复仇', '寻找', '调查', '修炼', '升级', '表白', '结婚'
+            ];
+            const moods = ['甜蜜', '紧张', '恐怖', '搞笑', '热血', '温馨', '浪漫', '悲伤'];
+            
+            for (const loc of locations) {
+                if (plot.includes(loc)) {
+                    keywords.location = loc;
+                    break;
+                }
+            }
+            
+            for (const act of actions) {
+                if (plot.includes(act)) {
+                    keywords.action = act;
+                    break;
+                }
+            }
+            
+            for (const mood of moods) {
+                if (plot.includes(mood)) {
+                    keywords.mood = mood;
+                    break;
+                }
+            }
+            
+            return keywords;
+        }
             
             for (const loc of locations) {
                 if (plot.includes(loc)) {
