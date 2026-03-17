@@ -1321,38 +1321,101 @@
             btn.textContent = '⏳ AI创作中...';
             progressDiv.style.display = 'block';
 
-            // 模拟4步进度
-            const steps = [
-                { step: 1, width: '25%', delay: 1000 },
-                { step: 2, width: '50%', delay: 2000 },
-                { step: 3, width: '75%', delay: 3000 },
-                { step: 4, width: '100%', delay: 4000 }
-            ];
-
-            for (const s of steps) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                document.getElementById('progressBar').style.width = s.width;
-                document.getElementById(`step${s.step}`).querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
-            }
-
-            // 生成完成
-            setTimeout(() => {
+            // 模拟4步进度（同时调用真实API）
+            try {
+                // 步骤1: 分析情节（25%）
+                await updateProgress(1, '25%', '正在分析情节...');
+                
+                // 步骤2: 生成角色（50%）
+                await updateProgress(2, '50%', '正在生成角色...');
+                
+                // 步骤3: 构建场景（75%）- 调用API
+                await updateProgress(3, '75%', '正在构建场景...');
+                
+                // 调用豆包AI（带限流控制）
+                const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount);
+                
+                // 步骤4: 生成对话（100%）
+                await updateProgress(4, '100%', '正在生成对话...');
+                
+                // 解析AI返回的内容
+                const storyData = parseAIResponse(aiResponse);
+                
+                if (storyData) {
+                    // 保存生成的故事到本地存储
+                    saveGeneratedStory(title, genre, storyData);
+                }
+                
+                // 生成完成
+                setTimeout(() => {
+                    completeGeneration(title, genre, sceneCount, style);
+                }, 500);
+                
+            } catch (error) {
+                console.error('AI生成失败:', error);
                 btn.disabled = false;
                 btn.textContent = '🤖 使用豆包AI生成故事 (消耗100金币)';
                 progressDiv.style.display = 'none';
                 
                 // 重置进度条
-                document.getElementById('progressBar').style.width = '0%';
-                [1, 2, 3, 4].forEach(i => {
-                    document.getElementById(`step${i}`).querySelector('div').style.background = 'rgba(255,255,255,0.1)';
-                });
-                document.getElementById('step1').querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
-
-                alert(`🎉 故事《${title}》生成完成！\n\n类型：${genre}\n场景数：${sceneCount}个\n风格：${getStyleName(style)}\n\n消耗：100金币`);
+                resetProgress();
                 
-                // 跳转到阅读页面
-                readComic('comic1');
-            }, 500);
+                // 显示错误信息
+                if (error.status === 429) {
+                    alert('❌ 服务器繁忙，请稍后再试\n（触发API限流保护）');
+                } else {
+                    alert('❌ 故事生成失败: ' + (error.message || '未知错误'));
+                }
+            }
+        }
+
+        // 更新进度
+        async function updateProgress(step, width, text) {
+            document.getElementById('progressBar').style.width = width;
+            for (let i = 1; i <= step; i++) {
+                document.getElementById(`step${i}`).querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+            }
+            // 添加延迟让用户看到进度变化
+            await new Promise(resolve => setTimeout(resolve, 800));
+        }
+
+        // 重置进度
+        function resetProgress() {
+            document.getElementById('progressBar').style.width = '0%';
+            [1, 2, 3, 4].forEach(i => {
+                document.getElementById(`step${i}`).querySelector('div').style.background = 'rgba(255,255,255,0.1)';
+            });
+            document.getElementById('step1').querySelector('div').style.background = 'linear-gradient(135deg, #8B5CF6, #EC4899)';
+        }
+
+        // 完成生成
+        function completeGeneration(title, genre, sceneCount, style) {
+            const btn = document.getElementById('aiGenerateBtn');
+            const progressDiv = document.getElementById('aiProgress');
+            
+            btn.disabled = false;
+            btn.textContent = '🤖 使用豆包AI生成故事 (消耗100金币)';
+            progressDiv.style.display = 'none';
+            
+            resetProgress();
+
+            alert(`🎉 故事《${title}》生成完成！\n\n类型：${genre}\n场景数：${sceneCount}个\n风格：${getStyleName(style)}\n\n消耗：100金币`);
+            
+            // 跳转到阅读页面
+            readComic('comic1');
+        }
+
+        // 保存生成的故事
+        function saveGeneratedStory(title, genre, storyData) {
+            const stories = JSON.parse(localStorage.getItem('aiGeneratedStories') || '[]');
+            stories.push({
+                id: 'ai_' + Date.now(),
+                title: title,
+                genre: genre,
+                data: storyData,
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('aiGeneratedStories', JSON.stringify(stories));
         }
 
         // 获取风格名称
@@ -1366,10 +1429,101 @@
             return styles[value] || value;
         }
 
-        // 豆包AI API调用（实际实现）
+        // ========== 限流控制模块 ==========
+        // 令牌桶算法 - 控制QPS在5-10之间
+        class TokenBucket {
+            constructor(capacity = 5, refillRate = 5) {
+                this.capacity = capacity;      // 桶容量（最大QPS）
+                this.tokens = capacity;        // 当前令牌数
+                this.refillRate = refillRate;  // 每秒补充令牌数
+                this.lastRefill = Date.now();  // 上次补充时间
+            }
+
+            // 获取令牌
+            async acquire() {
+                this.refill();
+                if (this.tokens >= 1) {
+                    this.tokens -= 1;
+                    return true;
+                }
+                // 没有令牌，等待
+                const waitTime = (1 - this.tokens) * (1000 / this.refillRate);
+                await this.sleep(waitTime);
+                return this.acquire();
+            }
+
+            // 补充令牌
+            refill() {
+                const now = Date.now();
+                const elapsed = (now - this.lastRefill) / 1000;
+                const tokensToAdd = elapsed * this.refillRate;
+                this.tokens = Math.min(this.capacity, this.tokens + tokensToAdd);
+                this.lastRefill = now;
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // 创建全局令牌桶实例（5 QPS，符合豆包默认限制）
+        const doubaoTokenBucket = new TokenBucket(5, 5);
+
+        // 指数退避 + 抖动
+        async function exponentialBackoffWithJitter(attempt, baseDelay = 1000, maxDelay = 32000) {
+            // 指数退避: 2^attempt * baseDelay
+            const exponentialDelay = Math.min(Math.pow(2, attempt) * baseDelay, maxDelay);
+            // 添加抖动: ±25%随机变化，避免重试风暴
+            const jitter = exponentialDelay * 0.25 * (Math.random() * 2 - 1);
+            const finalDelay = exponentialDelay + jitter;
+            console.log(`[限流] 第${attempt}次重试，等待${(finalDelay/1000).toFixed(1)}秒...`);
+            await new Promise(resolve => setTimeout(resolve, finalDelay));
+        }
+
+        // 带限流控制的API调用
+        async function callDoubaoWithRateLimit(prompt, genre, sceneCount, maxRetries = 3) {
+            // 先获取令牌（控制QPS）
+            await doubaoTokenBucket.acquire();
+            
+            let lastError = null;
+            
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                try {
+                    const result = await callDoubaoAI(prompt, genre, sceneCount);
+                    return result;
+                } catch (error) {
+                    lastError = error;
+                    
+                    // 检查是否是限流错误（429）
+                    if (error.status === 429 || 
+                        (error.message && error.message.includes('rate limit')) ||
+                        (error.code === 'rate_limit_exceeded')) {
+                        
+                        console.warn(`[限流] 触发豆包API限流（429），第${attempt + 1}次重试...`);
+                        
+                        if (attempt < maxRetries) {
+                            // 指数退避 + 抖动
+                            await exponentialBackoffWithJitter(attempt);
+                            continue;
+                        }
+                    }
+                    
+                    // 其他错误直接抛出
+                    throw error;
+                }
+            }
+            
+            // 所有重试都失败了
+            throw new Error(`API调用失败，已重试${maxRetries}次: ${lastError.message}`);
+        }
+
+        // ========== 豆包AI API调用（带限流） ==========
         async function callDoubaoAI(prompt, genre, sceneCount) {
             const API_KEY = '73249e08-1d3e-49a3-9120-9ca1fe4d075e';
             const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/responses';
+            
+            // 构建优化的prompt
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount);
             
             try {
                 const response = await fetch(ENDPOINT, {
@@ -1384,22 +1538,92 @@
                             role: "user",
                             content: [{
                                 type: "input_text",
-                                text: prompt
+                                text: optimizedPrompt
                             }]
                         }]
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API调用失败: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw { 
+                        status: response.status, 
+                        code: errorData.code || 'unknown',
+                        message: errorData.message || `API调用失败: ${response.status}`
+                    };
                 }
 
                 const data = await response.json();
                 return data.output.choices[0].message.content[0].text;
             } catch (error) {
                 console.error('豆包AI调用失败:', error);
-                return null;
+                throw error;
             }
+        }
+
+        // 构建优化的Prompt
+        function buildOptimizedPrompt(plot, genre, sceneCount) {
+            const genreTemplates = {
+                '恋爱': '甜蜜浪漫的恋爱故事',
+                '悬疑': '扣人心弦的悬疑推理',
+                '玄幻': '奇幻绚丽的修仙世界',
+                '科幻': '震撼人心的科幻冒险',
+                '恐怖': '惊悚刺激的恐怖体验',
+                '搞笑': '轻松幽默的喜剧故事',
+                '霸宠': '霸道总裁的甜宠剧情',
+                '穿越': '跨越时空的奇妙旅程',
+                '武侠': '快意恩仇的江湖侠义'
+            };
+
+            return `请为以下情节生成一个${genreTemplates[genre] || '精彩'}的互动漫画故事。
+
+**情节概要：**
+${plot}
+
+**要求：**
+1. 生成${sceneCount}个场景，每个场景包含：
+   - 场景描述（50字左右）
+   - 2-3句角色对话
+   - 2个选择分支（最后一场景为结局）
+
+2. 返回JSON格式：
+{
+  "scenes": [
+    {
+      "scene": 1,
+      "setting": "场景描述",
+      "dialogues": [
+        {"speaker": "角色名", "text": "对话内容"}
+      ],
+      "choices": [
+        {"text": "选项A", "next": 2},
+        {"text": "选项B", "next": 3}
+      ]
+    }
+  ]
+}
+
+3. 风格要求：符合${genre}类型的叙事特点
+4. 字数控制：总输出不超过3000字`;
+        }
+
+        // 解析AI返回的内容
+        function parseAIResponse(content) {
+            try {
+                // 尝试直接解析JSON
+                return JSON.parse(content);
+            } catch (e) {
+                // 提取JSON部分
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    try {
+                        return JSON.parse(jsonMatch[0]);
+                    } catch (e2) {
+                        console.error('JSON解析失败:', e2);
+                    }
+                }
+            }
+            return null;
         }
     </script>
 </body>
