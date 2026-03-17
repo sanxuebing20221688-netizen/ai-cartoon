@@ -1361,13 +1361,25 @@
                 
                 // 调用豆包AI（带限流控制）
                 const referenceImages = getReferenceImagesForAI();
-                const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount, referenceImages);
+                let storyData = null;
                 
-                // 步骤4: 生成对话（100%）
-                await updateProgress(4, '100%', '正在生成对话...');
-                
-                // 解析AI返回的内容
-                const storyData = parseAIResponse(aiResponse);
+                try {
+                    const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount, referenceImages);
+                    
+                    // 步骤4: 生成对话（100%）
+                    await updateProgress(4, '100%', '正在生成对话...');
+                    
+                    // 解析AI返回的内容
+                    storyData = parseAIResponse(aiResponse);
+                } catch (apiError) {
+                    console.warn('[AI] API调用失败，使用模板生成:', apiError.message);
+                    
+                    // API失败，使用本地模板生成
+                    await updateProgress(3, '75%', '使用备用方案...');
+                    storyData = generateTemplateStory(plot, genre, parseInt(sceneCount));
+                    
+                    await updateProgress(4, '100%', '正在生成对话...');
+                }
                 
                 if (storyData) {
                     // 保存生成的故事到本地存储
@@ -1661,12 +1673,13 @@
         // ========== 豆包AI API调用（带限流） ==========
         async function callDoubaoAI(prompt, genre, sceneCount, referenceImages = []) {
             const API_KEY = '73249e08-1d3e-49a3-9120-9ca1fe4d075e';
+            // 使用正确的API端点
             const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/responses';
             
             // 构建优化的prompt
             const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, referenceImages.length > 0);
             
-            // 构建content数组（支持文本+图片多模态）
+            // 构建content数组
             const content = [{
                 type: "input_text",
                 text: optimizedPrompt
@@ -1678,6 +1691,9 @@
                     content.push(img);
                 });
             }
+            
+            console.log('[豆包API] 发送请求到:', ENDPOINT);
+            console.log('[豆包API] 模型:', 'doubao-seed-2-0-pro-260215');
             
             try {
                 const response = await fetch(ENDPOINT, {
@@ -1695,19 +1711,42 @@
                     })
                 });
 
+                // 获取响应状态
+                console.log('[豆包API] 响应状态:', response.status, response.statusText);
+                
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw { 
-                        status: response.status, 
-                        code: errorData.code || 'unknown',
-                        message: errorData.message || `API调用失败: ${response.status}`
-                    };
+                    const errorText = await response.text();
+                    console.error('[豆包API] 错误响应:', errorText);
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        throw { 
+                            status: response.status, 
+                            code: errorData.code || 'unknown',
+                            message: errorData.message || errorData.error?.message || `API调用失败: ${response.status}`
+                        };
+                    } catch (e) {
+                        throw { 
+                            status: response.status, 
+                            code: 'parse_error',
+                            message: `API调用失败: ${response.status} - ${errorText.substring(0, 200)}`
+                        };
+                    }
                 }
 
                 const data = await response.json();
-                return data.output.choices[0].message.content[0].text;
+                console.log('[豆包API] 响应数据:', JSON.stringify(data).substring(0, 500));
+                
+                if (data.output && data.output.choices && data.output.choices[0]) {
+                    return data.output.choices[0].message.content[0].text;
+                } else {
+                    throw { 
+                        status: 500, 
+                        code: 'invalid_response',
+                        message: 'API响应格式不正确'
+                    };
+                }
             } catch (error) {
-                console.error('豆包AI调用失败:', error);
+                console.error('[豆包API] 调用失败:', error);
                 throw error;
             }
         }
@@ -1780,6 +1819,145 @@ ${referenceHint}
                 }
             }
             return null;
+        }
+
+        // 模板生成故事（API失败时的fallback）
+        function generateTemplateStory(plot, genre, sceneCount) {
+            // 提取关键词
+            const keywords = extractKeywordsFromPlot(plot);
+            
+            // 类型模板
+            const templates = {
+                '恋爱': {
+                    panels: ['💕', '☕', '🌙', '🌹', '💍'],
+                    dialogues: [
+                        [{speaker: '主角', text: keywords.action || '偶然相遇'}],
+                        [{speaker: '对方', text: '你好'}],
+                        [{speaker: '主角', text: '很高兴认识你'}]
+                    ]
+                },
+                '悬疑': {
+                    panels: ['🔍', '🏚️', '👤', '🩸', '❓'],
+                    dialogues: [
+                        [{speaker: '旁白', text: keywords.setting || '深夜的废弃工厂'}],
+                        [{speaker: '主角', text: '谁在那里？'}],
+                        [{speaker: '神秘人', text: '你终于来了'}]
+                    ]
+                },
+                '玄幻': {
+                    panels: ['🐉', '⚡', '🏰', '💎', '✨'],
+                    dialogues: [
+                        [{speaker: '旁白', text: '异世界的大门开启'}],
+                        [{speaker: '主角', text: '这是哪里？'}],
+                        [{speaker: '导师', text: '欢迎来到修仙世界'}]
+                    ]
+                },
+                '科幻': {
+                    panels: ['🚀', '🌌', '👽', '🛸', '🌍'],
+                    dialogues: [
+                        [{speaker: '舰长', text: '发现新星球！'}],
+                        [{speaker: '主角', text: '准备登陆'}],
+                        [{speaker: 'AI', text: '生命迹象确认'}]
+                    ]
+                },
+                '恐怖': {
+                    panels: ['👻', '🕯️', '🚪', '🩸', '💀'],
+                    dialogues: [
+                        [{speaker: '旁白', text: '深夜的古老宅邸'}],
+                        [{speaker: '主角', text: '什么声音？'}],
+                        [{speaker: '鬼魂', text: '滚出去！'}]
+                    ]
+                },
+                '搞笑': {
+                    panels: ['😂', '😅', '😆', '🤣', '💀'],
+                    dialogues: [
+                        [{speaker: '主角', text: '今天也太倒霉了吧'}],
+                        [{speaker: '朋友', text: '哈哈哈'}],
+                        [{speaker: '主角', text: '笑什么笑'}]
+                    ]
+                },
+                '霸宠': {
+                    panels: ['👑', '💼', '🏠', '💕', '💍'],
+                    dialogues: [
+                        [{speaker: '总裁', text: '女人，你引起了我的注意'}],
+                        [{speaker: '女主', text: '放开我！'}],
+                        [{speaker: '总裁', text: '你是我的'}]
+                    ]
+                },
+                '穿越': {
+                    panels: ['🌀', '⚡', '🏯', '👘', '🎌'],
+                    dialogues: [
+                        [{speaker: '系统', text: '穿越成功！'}],
+                        [{speaker: '主角', text: '这是哪里？'}],
+                        [{speaker: '古人', text: '你是何人？'}]
+                    ]
+                },
+                '武侠': {
+                    panels: ['⚔️', '🏔️', '🥋', '📜', '🏆'],
+                    dialogues: [
+                        [{speaker: '师父', text: '今日教你本门绝学'}],
+                        [{speaker: '徒弟', text: '弟子受教'}],
+                        [{speaker: '师父', text: '去吧，行侠仗义'}]
+                    ]
+                }
+            };
+
+            const template = templates[genre] || templates['恋爱'];
+            const scenes = [];
+            
+            for (let i = 0; i < sceneCount; i++) {
+                const isLast = i === sceneCount - 1;
+                const scene = {
+                    scene: i + 1,
+                    setting: `场景${i+1}: ${template.panels[i % template.panels.length]} ${keywords.setting || '开始'}`.substring(0, 50),
+                    dialogues: template.dialogues[i % template.dialogues.length].map(d => ({
+                        speaker: d.speaker,
+                        text: d.text
+                    }))
+                };
+                
+                if (!isLast) {
+                    scene.choices = [
+                        {text: '🔵 选项A', next: i + 2},
+                        {text: '🔴 选项B', next: i + 2}
+                    ];
+                } else {
+                    scene.ending = genre + '结局';
+                }
+                
+                scenes.push(scene);
+            }
+            
+            return { scenes };
+        }
+
+        // 从情节中提取关键词
+        function extractKeywordsFromPlot(plot) {
+            const keywords = {
+                location: '',
+                action: '',
+                target: ''
+            };
+            
+            const locations = ['校园', '图书馆', '咖啡厅', '城市', '乡村', '古堡', '太空', '深海', '山村', '皇宫'];
+            const actions = ['相遇', '重逢', '逃跑', '战斗', '学习', '成长', '冒险', '探索', '拯救'];
+            const targets = ['她', '他', '神秘人', '导师', '敌人', '伙伴'];
+            
+            for (const loc of locations) {
+                if (plot.includes(loc)) {
+                    keywords.location = loc;
+                    break;
+                }
+            }
+            
+            for (const act of actions) {
+                if (plot.includes(act)) {
+                    keywords.action = act;
+                    break;
+                }
+            }
+            
+            return keywords;
         }
     </script>
 </body>
