@@ -1066,23 +1066,19 @@
 
             <div class="section">
                 <h3 style="margin-bottom: 20px; color: #EC4899;">📚 我的作品</h3>
-                <div class="featured-grid" id="myWorks">
-                    <div class="featured-card" onclick="readComic('my1')">
-                        <div class="featured-icon">💕</div>
-                        <div class="featured-title">命中注定遇见你</div>
-                        <div class="featured-meta">
-                            <span>👁️ 234次阅读</span>
-                            <span>❤️ 56个赞</span>
-                        </div>
-                    </div>
-                    <div class="featured-card" onclick="readComic('my2')">
-                        <div class="featured-icon">🔍</div>
-                        <div class="featured-title">午夜图书馆</div>
-                        <div class="featured-meta">
-                            <span>👁️ 189次阅读</span>
-                            <span>❤️ 43个赞</span>
-                        </div>
-                    </div>
+                <div id="myWorksLoading" style="text-align: center; padding: 20px; color: #94A3B8;">
+                    加载中...
+                </div>
+                <div class="featured-grid" id="myWorks" style="display: none;">
+                    <!-- AI生成的作品将动态显示在这里 -->
+                </div>
+                <div id="myWorksEmpty" style="display: none; text-align: center; padding: 40px; color: #94A3B8;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">📝</div>
+                    <div>还没有作品</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px;">去创作你的第一个AI故事吧！</div>
+                    <button onclick="showPage('create')" style="margin-top: 20px; padding: 12px 24px; border-radius: 25px; border: none; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer; font-weight: 600;">
+                        🎨 开始创作
+                    </button>
                 </div>
             </div>
         </div>
@@ -1296,6 +1292,7 @@
         // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             updatePreview();
+            loadMyWorks();
         });
 
         // ========== AI创作功能 ==========
@@ -1465,6 +1462,179 @@
         // 更新场景数量显示
         function updateSceneCountValue(value) {
             document.getElementById('sceneCountValue').textContent = value;
+        }
+
+        // 加载我的作品
+        function loadMyWorks() {
+            const loadingEl = document.getElementById('myWorksLoading');
+            const worksEl = document.getElementById('myWorks');
+            const emptyEl = document.getElementById('myWorksEmpty');
+            
+            if (!loadingEl || !worksEl) return;
+            
+            // 获取AI生成的故事
+            const stories = JSON.parse(localStorage.getItem('aiGeneratedStories') || '[]');
+            
+            loadingEl.style.display = 'none';
+            
+            if (stories.length === 0) {
+                worksEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            
+            worksEl.style.display = 'grid';
+            emptyEl.style.display = 'none';
+            
+            // 类型图标映射
+            const genreIcons = {
+                '恋爱': '💕', '悬疑': '🔍', '玄幻': '🐉', '科幻': '🚀',
+                '恐怖': '👻', '搞笑': '😂', '霸宠': '👑', '穿越': '🌀', '武侠': '⚔️'
+            };
+            
+            // 生成作品卡片HTML
+            worksEl.innerHTML = stories.map((story, index) => {
+                const date = new Date(story.createdAt).toLocaleDateString('zh-CN');
+                const icon = genreIcons[story.genre] || '📖';
+                const sceneCount = story.data?.scenes?.length || 0;
+                
+                return `
+                    <div class="featured-card" onclick="readAIStory(${index})" style="cursor: pointer; position: relative;">
+                        <button onclick="event.stopPropagation(); deleteAIStory(${index})" 
+                            style="position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; 
+                                   border-radius: 50%; background: rgba(239, 68, 68, 0.8); border: none; 
+                                   color: white; cursor: pointer; font-size: 14px; z-index: 10;">
+                            ×
+                        </button>
+                        <div class="featured-icon">${icon}</div>
+                        <div class="featured-title">${story.title}</div>
+                        <div class="featured-meta">
+                            <span>${story.genre}</span>
+                            <span>${sceneCount}个场景</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #94A3B8; margin-top: 8px;">
+                            📅 ${date}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 更新统计
+            const statCreated = document.getElementById('statCreated');
+            if (statCreated) {
+                statCreated.textContent = stories.length;
+            }
+        }
+
+        // 读取AI生成的故事
+        function readAIStory(index) {
+            const stories = JSON.parse(localStorage.getItem('aiGeneratedStories') || '[]');
+            const story = stories[index];
+            
+            if (story && story.data) {
+                // 将故事数据设置到全局变量
+                window.currentAIStory = story.data;
+                window.currentAIStoryTitle = story.title;
+                
+                // 跳转到阅读页面
+                showPage('read');
+                
+                // 渲染故事
+                renderAIStory(story.data);
+            }
+        }
+
+        // 渲染AI故事
+        function renderAIStory(storyData) {
+            if (!storyData || !storyData.scenes || storyData.scenes.length === 0) {
+                alert('故事数据无效');
+                return;
+            }
+            
+            // 设置故事标题
+            document.getElementById('panelImage').textContent = window.currentAIStoryTitle || 'AI创作故事';
+            
+            // 渲染第一个场景
+            renderAIScene(0);
+        }
+
+        // 渲染AI故事场景
+        function renderAIScene(sceneIndex) {
+            const storyData = window.currentAIStory;
+            if (!storyData || !storyData.scenes) return;
+            
+            const scenes = storyData.scenes;
+            const scene = scenes[sceneIndex];
+            
+            if (!scene) return;
+            
+            // 更新场景图片
+            const panelImage = document.getElementById('panelImage');
+            if (scene.panel) {
+                panelImage.textContent = scene.panel;
+            }
+            
+            // 渲染对话
+            const storyContent = document.getElementById('storyContent');
+            if (scene.dialogues) {
+                storyContent.innerHTML = scene.dialogues.map(d => `
+                    <div class="dialogue">
+                        <div class="speaker">${d.speaker}</div>
+                        <div>${d.text}</div>
+                    </div>
+                `).join('');
+            }
+            
+            // 渲染选项
+            const choiceContainer = document.getElementById('choiceContainer');
+            const choicesDiv = document.getElementById('choices');
+            
+            if (scene.choices && scene.choices.length > 0) {
+                choiceContainer.style.display = 'block';
+                choicesDiv.innerHTML = scene.choices.map(choice => `
+                    <button class="choice-btn" onclick="handleAIChoice('${choice.text}', ${choice.next})">
+                        ${choice.text}
+                    </button>
+                `).join('');
+            } else if (scene.ending) {
+                // 结局
+                choiceContainer.style.display = 'block';
+                choicesDiv.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #FBBF24;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🎉</div>
+                        <div style="font-size: 1.2rem; font-weight: 600;">${scene.ending}</div>
+                        <div style="margin-top: 20px;">
+                            <button onclick="showPage('profile')" style="padding: 10px 20px; border-radius: 20px; border: none; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer;">
+                                返回我的作品
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                choiceContainer.style.display = 'none';
+            }
+            
+            // 更新进度
+            window.currentAISceneIndex = sceneIndex;
+        }
+
+        // 处理AI故事的选择
+        function handleAIChoice(choiceText, nextScene) {
+            if (nextScene) {
+                renderAIScene(nextScene - 1);
+            }
+        }
+
+        // 删除AI故事
+        function deleteAIStory(index) {
+            if (!confirm('确定要删除这个作品吗？')) return;
+            
+            const stories = JSON.parse(localStorage.getItem('aiGeneratedStories') || '[]');
+            stories.splice(index, 1);
+            localStorage.setItem('aiGeneratedStories', JSON.stringify(stories));
+            
+            // 重新加载
+            loadMyWorks();
         }
 
         // AI生成故事
