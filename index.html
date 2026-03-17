@@ -1006,8 +1006,10 @@
 
         // ========== 初始化 ==========
         document.addEventListener('DOMContentLoaded', () => {
+            loadAIConfig(); // 加载AI配置
             renderGenres(); renderFeatures(); renderHomeFeatured(); loadUser();
         });
     </script>
+    <script src="multi-ai-provider.js"></script>
 </body>
 </html>
