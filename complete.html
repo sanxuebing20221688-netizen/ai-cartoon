@@ -1847,10 +1847,10 @@
         }
 
         // ========== 限流控制模块 ==========
-        // 令牌桶算法 - 控制QPS在5-10之间
-        // 建议配置：capacity=5-10, refillRate=capacity
+        // 令牌桶算法 - 控制QPS（当前1 QPS）
+        // 建议配置：capacity=1, refillRate=1（低频使用）
         class TokenBucket {
-            constructor(capacity = 5, refillRate = 5) {
+            constructor(capacity = 1, refillRate = 1) {
                 this.capacity = capacity;      // 桶容量（最大QPS）
                 this.tokens = capacity;        // 当前令牌数
                 this.refillRate = refillRate; // 每秒补充令牌数
@@ -1887,7 +1887,7 @@
         }
 
         // 创建全局令牌桶实例（5 QPS，符合豆包默认限制）
-        const doubaoTokenBucket = new TokenBucket(5, 5);
+        const doubaoTokenBucket = new TokenBucket(1, 1); // 1 QPS 限流
 
         // 指数退避 + 抖动
         async function exponentialBackoffWithJitter(attempt, baseDelay = 1000, maxDelay = 32000) {
@@ -2600,8 +2600,8 @@ ${referenceHint}
                 nameCn: '智谱AI',
                 endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
                 model: 'glm-4',
-                apiKey: '', // 用户需要配置
-                enabled: false,
+                apiKey: 'b8b131d4432d418fbad4a727d3de498f.l71VaviChq47nHoZ',
+                enabled: true,
                 supportsImages: false,
                 maxRetries: 3,
                 timeout: 30000
@@ -2612,8 +2612,8 @@ ${referenceHint}
                 nameCn: '通义千问',
                 endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
                 model: 'qwen-turbo',
-                apiKey: '', // 用户需要配置
-                enabled: false,
+                apiKey: 'sk-ed81ae54d5ce4fc8a0858d81fd6bda0d',
+                enabled: true,
                 supportsImages: false,
                 maxRetries: 3,
                 timeout: 30000
