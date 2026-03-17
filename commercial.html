@@ -906,7 +906,7 @@
                 <!-- AI服务商选择 -->
                 <div class="create-section" style="margin-top: 20px;">
                     <h3>🔧 AI服务商设置</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; align-items: center;">
                         <button class="provider-btn active" id="provider-doubao" onclick="selectAIProvider('doubao')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #8B5CF6; background: rgba(139, 92, 246, 0.2); color: white; cursor: pointer;">
                             🟡 豆包
                         </button>
@@ -922,9 +922,49 @@
                         <button class="provider-btn" id="provider-qwen" onclick="selectAIProvider('qwen')" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #EC4899; background: transparent; color: #EC4899; cursor: pointer;">
                             🟣 通义千问
                         </button>
+                        <button onclick="showAPIConfigModal()" style="padding: 10px 15px; border-radius: 20px; border: 2px solid #6B7280; background: transparent; color: #9CA3AF; cursor: pointer; font-size: 0.9rem;">
+                            ⚙️ 配置
+                        </button>
                     </div>
                     <div style="margin-top: 10px; font-size: 0.85rem; color: #94A3B8;">
                         当前使用: <span id="currentProvider" style="color: #8B5CF6; font-weight: 600;">豆包AI</span>
+                    </div>
+                </div>
+
+                <!-- API配置弹窗 -->
+                <div id="apiConfigModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+                    <div style="background: linear-gradient(135deg, #1a1a2e, #0f172a); border: 2px solid #8B5CF6; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <h3 style="color: #8B5CF6; margin-bottom: 20px; text-align: center;">⚙️ API配置</h3>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟡 豆包 API Key</label>
+                            <input type="text" id="config-doubao" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #8B5CF6; background: rgba(15,23,42,0.8); color: white;" placeholder="输入豆包API Key">
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟢 OpenAI API Key</label>
+                            <input type="text" id="config-openai" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #10B981; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-xxx">
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟠 Claude API Key</label>
+                            <input type="text" id="config-claude" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #F59E0B; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-ant-xxx">
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🔵 智谱AI API Key</label>
+                            <input type="text" id="config-zhipu" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #3B82F6; background: rgba(15,23,42,0.8); color: white;" placeholder="输入智谱AI API Key">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟣 通义千问 API Key</label>
+                            <input type="text" id="config-qwen" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #EC4899; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-xxx">
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="saveAPIConfig()" style="flex: 1; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; cursor: pointer; font-weight: 600;">保存配置</button>
+                            <button onclick="closeAPIConfigModal()" style="flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #8B5CF6; background: transparent; color: #8B5CF6; cursor: pointer;">取消</button>
+                        </div>
                     </div>
                 </div>
 
@@ -1349,6 +1389,66 @@
             saveAIConfig();
             
             console.log(`[AI] 已切换到 ${config.nameCn}`);
+        }
+
+        // 显示API配置弹窗
+        function showAPIConfigModal() {
+            const modal = document.getElementById('apiConfigModal');
+            modal.style.display = 'flex';
+            
+            // 加载当前配置到输入框
+            document.getElementById('config-doubao').value = AI_PROVIDERS.doubao.apiKey || '';
+            document.getElementById('config-openai').value = AI_PROVIDERS.openai.apiKey || '';
+            document.getElementById('config-claude').value = AI_PROVIDERS.claude.apiKey || '';
+            document.getElementById('config-zhipu').value = AI_PROVIDERS.zhipu.apiKey || '';
+            document.getElementById('config-qwen').value = AI_PROVIDERS.qwen.apiKey || '';
+        }
+
+        // 关闭API配置弹窗
+        function closeAPIConfigModal() {
+            document.getElementById('apiConfigModal').style.display = 'none';
+        }
+
+        // 保存API配置
+        function saveAPIConfig() {
+            const doubaoKey = document.getElementById('config-doubao').value.trim();
+            const openaiKey = document.getElementById('config-openai').value.trim();
+            const claudeKey = document.getElementById('config-claude').value.trim();
+            const zhipuKey = document.getElementById('config-zhipu').value.trim();
+            const qwenKey = document.getElementById('config-qwen').value.trim();
+            
+            // 更新配置
+            if (doubaoKey) {
+                AI_PROVIDERS.doubao.apiKey = doubaoKey;
+                AI_PROVIDERS.doubao.enabled = true;
+            }
+            if (openaiKey) {
+                AI_PROVIDERS.openai.apiKey = openaiKey;
+                AI_PROVIDERS.openai.enabled = true;
+            }
+            if (claudeKey) {
+                AI_PROVIDERS.claude.apiKey = claudeKey;
+                AI_PROVIDERS.claude.enabled = true;
+            }
+            if (zhipuKey) {
+                AI_PROVIDERS.zhipu.apiKey = zhipuKey;
+                AI_PROVIDERS.zhipu.enabled = true;
+            }
+            if (qwenKey) {
+                AI_PROVIDERS.qwen.apiKey = qwenKey;
+                AI_PROVIDERS.qwen.enabled = true;
+            }
+            
+            // 保存到localStorage
+            saveAIConfig();
+            
+            // 更新活跃提供商
+            activeAIProviders = Object.keys(AI_PROVIDERS).filter(k => 
+                AI_PROVIDERS[k].enabled && AI_PROVIDERS[k].apiKey
+            );
+            
+            alert('✅ API配置已保存！\n\n可以点击上方按钮切换AI服务商。');
+            closeAPIConfigModal();
         }
 
         // 更新字数统计
