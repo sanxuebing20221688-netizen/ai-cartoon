@@ -850,6 +850,33 @@
                     <input type="hidden" id="aiSelectedStyle" value="">
                 </div>
 
+                <!-- 步骤6：上传参考图（可选） -->
+                <div class="create-section">
+                    <h3>🖼️ 步骤6：上传参考图（可选）</h3>
+                    <div class="form-group">
+                        <label>上传参考图片（最多3张）</label>
+                        <div style="background: rgba(255,255,255,0.05); border: 2px dashed rgba(139, 92, 246, 0.5); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s;" onclick="document.getElementById('referenceImageInput').click()" ondragover="event.preventDefault(); this.style.background='rgba(139, 92, 246, 0.2)'" ondragleave="this.style.background='rgba(255,255,255,0.05)'" ondrop="handleImageDrop(event)">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📤</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">点击或拖拽上传图片</div>
+                            <div style="font-size: 0.85rem; color: #94A3B8;">支持 JPG、PNG、GIF，每张不超过5MB</div>
+                        </div>
+                        <input type="file" id="referenceImageInput" style="display: none;" accept="image/*" multiple onchange="handleImageSelect(event)">
+                        
+                        <!-- 图片预览区域 -->
+                        <div id="imagePreviewArea" style="display: none; margin-top: 15px;">
+                            <div style="font-size: 0.9rem; color: #94A3B8; margin-bottom: 10px;">已上传 <span id="uploadedCount">0</span>/3 张</div>
+                            <div id="imagePreviewList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                <!-- 图片预览将在这里动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(139, 92, 246, 0.1); border-radius: 8px; padding: 12px; margin-top: 10px;">
+                        <div style="font-size: 0.85rem; color: #94A3B8;">
+                            <span style="color: #8B5CF6;">💡</span> 参考图可以帮助AI更好地理解你想要的角色形象、场景氛围或视觉风格
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 进度指示器（生成时显示） -->
                 <div id="aiProgress" style="display: none; margin: 30px 0;">
                     <h3 style="text-align: center; margin-bottom: 20px;">🤖 AI正在创作中...</h3>
@@ -1333,7 +1360,8 @@
                 await updateProgress(3, '75%', '正在构建场景...');
                 
                 // 调用豆包AI（带限流控制）
-                const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount);
+                const referenceImages = getReferenceImagesForAI();
+                const aiResponse = await callDoubaoWithRateLimit(plot, genre, sceneCount, referenceImages);
                 
                 // 步骤4: 生成对话（100%）
                 await updateProgress(4, '100%', '正在生成对话...');
@@ -1399,7 +1427,11 @@
             
             resetProgress();
 
-            alert(`🎉 故事《${title}》生成完成！\n\n类型：${genre}\n场景数：${sceneCount}个\n风格：${getStyleName(style)}\n\n消耗：100金币`);
+            alert(`🎉 故事《${title}》生成完成！\n\n类型：${genre}\n场景数：${sceneCount}个\n风格：${getStyleName(style)}\n${uploadedReferenceImages.length > 0 ? '参考图：' + uploadedReferenceImages.length + '张\n' : ''}\n消耗：100金币`);
+            
+            // 清空参考图
+            uploadedReferenceImages = [];
+            updateImagePreview();
             
             // 跳转到阅读页面
             readComic('comic1');
@@ -1413,6 +1445,11 @@
                 title: title,
                 genre: genre,
                 data: storyData,
+                referenceImages: uploadedReferenceImages.map(img => ({
+                    name: img.name,
+                    type: img.type,
+                    data: img.data
+                })), // 保存参考图信息
                 createdAt: new Date().toISOString()
             });
             localStorage.setItem('aiGeneratedStories', JSON.stringify(stories));
@@ -1427,6 +1464,110 @@
                 'watercolor': '水彩画风'
             };
             return styles[value] || value;
+        }
+
+        // ========== 参考图处理模块 ==========
+        // 存储已上传的图片
+        let uploadedReferenceImages = [];
+        const MAX_IMAGES = 3;
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+        // 处理文件选择
+        function handleImageSelect(event) {
+            const files = Array.from(event.target.files);
+            processImages(files);
+        }
+
+        // 处理拖拽上传
+        function handleImageDrop(event) {
+            event.preventDefault();
+            event.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+            const files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+            processImages(files);
+        }
+
+        // 处理图片文件
+        function processImages(files) {
+            const remainingSlots = MAX_IMAGES - uploadedReferenceImages.length;
+            
+            if (remainingSlots <= 0) {
+                alert('最多只能上传3张参考图');
+                return;
+            }
+
+            const filesToProcess = files.slice(0, remainingSlots);
+            
+            filesToProcess.forEach(file => {
+                // 检查文件大小
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`图片 "${file.name}" 超过5MB限制，已跳过`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = {
+                        id: 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        name: file.name,
+                        data: e.target.result, // Base64编码
+                        type: file.type,
+                        size: file.size
+                    };
+                    
+                    uploadedReferenceImages.push(imageData);
+                    updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 更新图片预览
+        function updateImagePreview() {
+            const previewArea = document.getElementById('imagePreviewArea');
+            const previewList = document.getElementById('imagePreviewList');
+            const countSpan = document.getElementById('uploadedCount');
+            
+            if (uploadedReferenceImages.length === 0) {
+                previewArea.style.display = 'none';
+                return;
+            }
+
+            previewArea.style.display = 'block';
+            countSpan.textContent = uploadedReferenceImages.length;
+            
+            previewList.innerHTML = uploadedReferenceImages.map((img, index) => `
+                <div style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1;">
+                    <img src="${img.data}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button onclick="removeReferenceImage('${img.id}')" 
+                        style="position: absolute; top: 5px; right: 5px; width: 24px; height: 24px; 
+                               border-radius: 50%; background: rgba(239, 68, 68, 0.9); border: none; 
+                               color: white; cursor: pointer; font-size: 14px; display: flex; 
+                               align-items: center; justify-content: center;">
+                        ×
+                    </button>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); 
+                                padding: 4px 8px; font-size: 0.7rem; color: white; white-space: nowrap; 
+                                overflow: hidden; text-overflow: ellipsis;">
+                        ${img.name}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 删除参考图
+        function removeReferenceImage(imageId) {
+            uploadedReferenceImages = uploadedReferenceImages.filter(img => img.id !== imageId);
+            updateImagePreview();
+        }
+
+        // 获取参考图Base64数据（用于发送到AI）
+        function getReferenceImagesForAI() {
+            return uploadedReferenceImages.map(img => ({
+                type: 'image_url',
+                image_url: {
+                    url: img.data
+                }
+            }));
         }
 
         // ========== 限流控制模块 ==========
@@ -1481,7 +1622,7 @@
         }
 
         // 带限流控制的API调用
-        async function callDoubaoWithRateLimit(prompt, genre, sceneCount, maxRetries = 3) {
+        async function callDoubaoWithRateLimit(prompt, genre, sceneCount, referenceImages = [], maxRetries = 3) {
             // 先获取令牌（控制QPS）
             await doubaoTokenBucket.acquire();
             
@@ -1489,7 +1630,7 @@
             
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 try {
-                    const result = await callDoubaoAI(prompt, genre, sceneCount);
+                    const result = await callDoubaoAI(prompt, genre, sceneCount, referenceImages);
                     return result;
                 } catch (error) {
                     lastError = error;
@@ -1518,12 +1659,25 @@
         }
 
         // ========== 豆包AI API调用（带限流） ==========
-        async function callDoubaoAI(prompt, genre, sceneCount) {
+        async function callDoubaoAI(prompt, genre, sceneCount, referenceImages = []) {
             const API_KEY = '73249e08-1d3e-49a3-9120-9ca1fe4d075e';
             const ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/responses';
             
             // 构建优化的prompt
-            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount);
+            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, referenceImages.length > 0);
+            
+            // 构建content数组（支持文本+图片多模态）
+            const content = [{
+                type: "input_text",
+                text: optimizedPrompt
+            }];
+            
+            // 如果有参考图，添加到content
+            if (referenceImages && referenceImages.length > 0) {
+                referenceImages.forEach(img => {
+                    content.push(img);
+                });
+            }
             
             try {
                 const response = await fetch(ENDPOINT, {
@@ -1536,10 +1690,7 @@
                         model: "doubao-seed-2-0-pro-260215",
                         input: [{
                             role: "user",
-                            content: [{
-                                type: "input_text",
-                                text: optimizedPrompt
-                            }]
+                            content: content
                         }]
                     })
                 });
@@ -1562,7 +1713,7 @@
         }
 
         // 构建优化的Prompt
-        function buildOptimizedPrompt(plot, genre, sceneCount) {
+        function buildOptimizedPrompt(plot, genre, sceneCount, hasReferenceImages = false) {
             const genreTemplates = {
                 '恋爱': '甜蜜浪漫的恋爱故事',
                 '悬疑': '扣人心弦的悬疑推理',
@@ -1575,11 +1726,16 @@
                 '武侠': '快意恩仇的江湖侠义'
             };
 
+            const referenceHint = hasReferenceImages ? `
+**参考图说明：**
+用户已上传参考图片，请仔细参考图片中的角色形象、场景风格或视觉元素，将其融入到故事创作中。注意保持与参考图一致的风格和氛围。
+` : '';
+
             return `请为以下情节生成一个${genreTemplates[genre] || '精彩'}的互动漫画故事。
 
 **情节概要：**
 ${plot}
-
+${referenceHint}
 **要求：**
 1. 生成${sceneCount}个场景，每个场景包含：
    - 场景描述（50字左右）
