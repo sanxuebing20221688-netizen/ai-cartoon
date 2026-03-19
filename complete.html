@@ -922,6 +922,7 @@
                 <button class="filter-btn" onclick="filterComics('玄幻')">🐉 玄幻</button>
                 <button class="filter-btn" onclick="filterComics('科幻')">🚀 科幻</button>
                 <button class="filter-btn" onclick="filterComics('恐怖')">👻 恐怖</button>
+                <button class="filter-btn" onclick="filterComics('武侠')">⚔️ 武侠</button>
             </div>
 
             <div class="comic-list" id="comicList">
@@ -1012,8 +1013,15 @@
             currentScene: 0
         };
 
-        // 漫画数据库
+        // 漫画数据库（已集成5个AI生成故事）
         const comicsDB = [
+            // AI生成的5个故事（置顶显示）
+            { id: 'story-001', title: '水晶勇者的传说', genre: '玄幻', icon: '🐉', rating: 4.9, readers: '15.2K', author: 'AI创作者' },
+            { id: 'story-002', title: '赛博少女2077', genre: '科幻', icon: '🤖', rating: 4.8, readers: '18.5K', author: 'AI创作者' },
+            { id: 'story-003', title: '剑影江湖', genre: '武侠', icon: '⚔️', rating: 4.9, readers: '22.3K', author: 'AI创作者' },
+            { id: 'story-004', title: '樱花下的约定', genre: '恋爱', icon: '💕', rating: 4.7, readers: '25.8K', author: 'AI创作者' },
+            { id: 'story-005', title: '午夜校舍', genre: '恐怖', icon: '👻', rating: 4.6, readers: '19.7K', author: 'AI创作者' },
+            // 原有示例数据
             { id: 'comic1', title: '命中注定遇见你', genre: '恋爱', icon: '💕', rating: 4.8, readers: '12.5K', author: 'AI创作者' },
             { id: 'comic2', title: '午夜图书馆', genre: '悬疑', icon: '🔍', rating: 4.9, readers: '8.9K', author: '神秘作家' },
             { id: 'comic3', title: '异世界转生记', genre: '玄幻', icon: '🐉', rating: 4.7, readers: '15K', author: '幻想大师' },
@@ -1024,6 +1032,97 @@
 
         // 故事场景数据
         const storyScenes = {
+            // AI故事1：水晶勇者的传说
+            'story-001': [
+                {
+                    panel: '🔮',
+                    dialogues: [
+                        { speaker: '旁白', text: '魔法大陆，一个充满奇迹的世界。艾莉亚是一个普通的村庄少女，每天帮助父母打理杂货店。' },
+                        { speaker: '艾莉亚', text: '（伸懒腰）今天的生意真不错呢~' },
+                        { speaker: '旁白', text: '傍晚时分，她像往常一样去森林里采药，却意外发现了一道奇异的光芒...' }
+                    ],
+                    choices: [
+                        { text: '🔮 靠近光芒查看', next: 1 },
+                        { text: '🏠 返回村庄报告', next: 2 }
+                    ]
+                },
+                {
+                    panel: '⚔️',
+                    dialogues: [
+                        { speaker: '旁白', text: '艾莉亚小心翼翼地靠近光芒，发现那是一把插在石头中的水晶剑。' },
+                        { speaker: '神秘声音', text: '终于等到你了，被选中者...' },
+                        { speaker: '艾莉亚', text: '这是...什么？为什么我能听懂它说话？' },
+                        { speaker: '神秘声音', text: '我是水晶剑的灵魂。你已被选中，成为预言中的勇者。' }
+                    ],
+                    choices: [
+                        { text: '✅ 接受使命', next: 3 },
+                        { text: '❋ 拒绝离开', next: 4 }
+                    ]
+                }
+            ],
+            // AI故事2：赛博少女2077
+            'story-002': [
+                {
+                    panel: '🤖',
+                    dialogues: [
+                        { speaker: '旁白', text: '2077年，新东京。霓虹灯闪烁的未来都市，底层的人民生活在贫民窟的阴影里。' },
+                        { speaker: '零', text: '（在废弃工厂醒来）我...我是谁？' },
+                        { speaker: '旁白', text: '她的记忆只停留在三个月前，手臂上有一个神秘的编号：X-771。' }
+                    ],
+                    choices: [
+                        { text: '🔍 寻找记忆线索', next: 1 },
+                        { text: '🍞 先找食物生存', next: 2 }
+                    ]
+                }
+            ],
+            // AI故事3：剑影江湖
+            'story-003': [
+                {
+                    panel: '⚔️',
+                    dialogues: [
+                        { speaker: '旁白', text: '云深不知处，少年林墨正在竹林中练剑。十八年的时光，让他从一个懵懂少年成长为剑术高手。' },
+                        { speaker: '师父', text: '墨儿，练剑暂停。为师有话要对你说。' },
+                        { speaker: '林墨', text: '（收剑）师父，怎么了？' },
+                        { speaker: '师父', text: '十八年了，该让你知道真相了。' }
+                    ],
+                    choices: [
+                        { text: '👂 倾听师父的话', next: 1 },
+                        { text: '❓ 询问真相', next: 2 }
+                    ]
+                }
+            ],
+            // AI故事4：樱花下的约定
+            'story-004': [
+                {
+                    panel: '🌸',
+                    dialogues: [
+                        { speaker: '旁白', text: '春假结束的第一天，樱丘高中的樱花树上开满了粉色的花朵。' },
+                        { speaker: '小雨', text: '（走在樱花树下）春天终于来了呢...' },
+                        { speaker: '旁白', text: '突然，她注意到地上有一本掉落的日记本，封面上写着"不要打开"。' }
+                    ],
+                    choices: [
+                        { text: '📖 翻开日记本', next: 1 },
+                        { text: '🔍 寻找失主', next: 2 }
+                    ]
+                }
+            ],
+            // AI故事5：午夜校舍
+            'story-005': [
+                {
+                    panel: '👻',
+                    dialogues: [
+                        { speaker: '旁白', text: '樱丘高中的旧校舍因为一场火灾被废弃了十年。传说每到月圆之夜，那里就会传出学生的哭声...' },
+                        { speaker: '社长', text: '今天是月圆之夜，我们进去调查一下吧！' },
+                        { speaker: '小明', text: '真、真的要进去吗？那里很可怕啊...' }
+                    ],
+                    choices: [
+                        { text: '🔦 勇敢探索', next: 1 },
+                        { text: '⚠️ 劝阻大家', next: 2 }
+                    ]
+                }
+            ],
+            // 原有示例数据
+            comic1: [
             comic1: [
                 {
                     panel: '💕',
