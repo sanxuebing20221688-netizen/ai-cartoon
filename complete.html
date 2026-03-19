@@ -852,24 +852,15 @@
                             <input type="text" id="config-doubao" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #8B5CF6; background: rgba(15,23,42,0.8); color: white;" placeholder="输入豆包API Key">
                         </div>
                         
-                        <div style="margin-bottom: 15px;">
-                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟢 OpenAI API Key</label>
-                            <input type="text" id="config-openai" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #10B981; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-xxx">
-                        </div>
+                        <!-- ❌ 已移除：OpenAI、Claude、智谱AI、通义千问配置 - 只使用豆包 -->
+                        <!-- 已移除以下配置项，为节省成本只保留豆包AI -->
                         
-                        <div style="margin-bottom: 15px;">
-                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟠 Claude API Key</label>
-                            <input type="text" id="config-claude" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #F59E0B; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-ant-xxx">
-                        </div>
-                        
-                        <div style="margin-bottom: 15px;">
-                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🔵 智谱AI API Key</label>
-                            <input type="text" id="config-zhipu" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #3B82F6; background: rgba(15,23,42,0.8); color: white;" placeholder="输入智谱AI API Key">
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <label style="color: #94A3B8; display: block; margin-bottom: 5px;">🟣 通义千问 API Key</label>
-                            <input type="text" id="config-qwen" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #EC4899; background: rgba(15,23,42,0.8); color: white;" placeholder="sk-xxx">
+                        <div style="margin-bottom: 20px; padding: 15px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 8px;">
+                            <div style="font-size: 0.9rem; color: #8B5CF6; font-weight: 600; margin-bottom: 8px;">ℹ️ 当前只使用豆包AI</div>
+                            <div style="font-size: 0.85rem; color: #94AB8; margin-top: 5px;">
+                                为节省成本，平台已禁用其他模型。<br>
+                                豆包AI：1积分/次（成本最低）
+                            </div>
                         </div>
                         
                         <div style="display: flex; gap: 10px;">
@@ -2763,30 +2754,13 @@ ${referenceHint}
                 maxRetries: 3,
                 timeout: 30000
             },
-            // OpenAI
-            openai: {
-                name: 'OpenAI',
-                nameCn: 'ChatGPT',
-                endpoint: 'https://api.openai.com/v1/chat/completions',
-                model: 'gpt-3.5-turbo',
-                apiKey: '', // 用户需要配置
-                enabled: false,
-                supportsImages: false,
-                maxRetries: 3,
-                timeout: 30000
-            },
-            // Claude (Anthropic)
-            claude: {
-                name: 'Claude',
-                nameCn: 'Claude',
-                endpoint: 'https://api.anthropic.com/v1/messages',
-                model: 'claude-3-haiku-20240307',
-                apiKey: '', // 用户需要配置
-                enabled: false,
-                supportsImages: false,
-                maxRetries: 3,
-                timeout: 30000
-            },
+            // ❌ 已移除：OpenAI - 5积分/次（成本较高）
+            // ❌ 已移除：Claude - 8积分/次（成本较高）
+            // 只保留豆包AI（成本最低）
+            // openai: { name: 'OpenAI', enabled: false, ... },
+            // claude: { name: 'Claude', enabled: false, ... },
+            // openai 和 claude 配置已从列表中移除，不再提供
+            // 如需恢复其他模型，请重新添加配置
             // 智谱AI - ⚠️ 已禁用（成本过高）
             zhipu: {
                 name: 'ZhipuAI',
@@ -2818,47 +2792,47 @@ ${referenceHint}
         // 当前活跃的AI服务商（按优先级排序）
         let activeAIProviders = ['doubao'];
 
-        // 加载AI配置
+        // 加载AI配置（只加载豆包）
         function loadAIConfig() {
             const config = localStorage.getItem('aiProviderConfig');
             if (config) {
                 try {
                     const parsed = JSON.parse(config);
-                    Object.keys(parsed).forEach(key => {
-                        if (AI_PROVIDERS[key]) {
-                            AI_PROVIDERS[key].apiKey = parsed[key].apiKey || '';
-                            AI_PROVIDERS[key].enabled = parsed[key].enabled || false;
-                        }
-                    });
+                    
+                    // ❌ 为节省成本，只加载豆包的配置
+                    // 忽略其他模型的配置，避免被意外启用
+                    if (parsed.doubao) {
+                        AI_PROVIDERS.doubao.apiKey = parsed.doubao.apiKey || '';
+                        AI_PROVIDERS.doubao.enabled = parsed.doubao.enabled !== false;
+                    }
+                    
+                    console.log('[AI] 已加载配置（仅豆包AI）');
                 } catch (e) {
                     console.error('加载AI配置失败:', e);
                 }
             }
             
-            // 更新活跃提供商
-            activeAIProviders = Object.keys(AI_PROVIDERS).filter(k => 
-                AI_PROVIDERS[k].enabled && AI_PROVIDERS[k].apiKey
-            );
+            // 强制只使用豆包（节省成本）
+            activeAIProviders = ['doubao'];
+            AI_PROVIDERS.doubao.enabled = true;
             
-            // 如果没有启用的，保留豆包
-            if (activeAIProviders.length === 0) {
-                activeAIProviders = ['doubao'];
-                AI_PROVIDERS.doubao.enabled = true;
-            }
-            
-            console.log('[AI] 当前活跃服务商:', activeAIProviders.map(p => AI_PROVIDERS[p].nameCn));
+            console.log('[AI] 当前活跃服务商: 豆包AI（唯一）');
         }
 
-        // 保存AI配置
+        // 保存AI配置（只保存豆包）
         function saveAIConfig() {
-            const config = {};
-            Object.keys(AI_PROVIDERS).forEach(key => {
-                config[key] = {
-                    apiKey: AI_PROVIDERS[key].apiKey,
-                    enabled: AI_PROVIDERS[key].enabled
-                };
-            });
+            // ❌ 为节省成本，只保存豆包AI的配置
+            // 其他模型配置不再保存到localStorage，避免被意外启用
+            const config = {
+                doubao: {
+                    apiKey: AI_PROVIDERS.doubao.apiKey,
+                    enabled: AI_PROVIDERS.doubao.enabled
+                }
+                // ❌ 其他模型配置已移除，不再保存
+            };
+            
             localStorage.setItem('aiProviderConfig', JSON.stringify(config));
+            console.log('[AI] 已保存配置（仅豆包AI）');
         }
 
         // ========== 成本控制系统 ==========
@@ -3034,16 +3008,25 @@ ${referenceHint}
             switch (provider) {
                 case 'doubao':
                     return await callDoubaoAPI_v2(prompt, genre, sceneCount, referenceImages, config);
-                case 'openai':
-                    return await callOpenAIAPI(prompt, genre, sceneCount, config);
-                case 'claude':
-                    return await callClaudeAPI(prompt, genre, sceneCount, config);
-                case 'zhipu':
-                    return await callZhipuAPI(prompt, genre, sceneCount, config);
-                case 'qwen':
-                    return await callQwenAPI(prompt, genre, sceneCount, config);
+                
+                // ❌ 已移除：OpenAI - 5积分/次（成本较高）
+                // case 'openai':
+                //     return await callOpenAIAPI(prompt, genre, sceneCount, config);
+                
+                // ❌ 已移除：Claude - 8积分/次（成本较高）
+                // case 'claude':
+                //     return await callClaudeAPI(prompt, genre, sceneCount, config);
+                
+                // ❌ 已移除：智谱AI (GLM-4) - 15积分/次（成本过高）
+                // case 'zhipu':
+                //     return await callZhipuAPI(prompt, genre, sceneCount, config);
+                
+                // ❌ 已移除：通义千问 - 3积分/次（成本较高）
+                // case 'qwen':
+                //     return await callQwenAPI(prompt, genre, sceneCount, config);
+                
                 default:
-                    throw new Error(`未知AI服务商: ${provider}`);
+                    throw new Error(`未知AI服务商: ${provider}（只支持豆包）`);
             }
         }
 
@@ -3080,58 +3063,68 @@ ${referenceHint}
             return data.output?.choices?.[0]?.message?.content?.[0]?.text || '';
         }
 
-        // OpenAI API
-        async function callOpenAIAPI(prompt, genre, sceneCount, config) {
-            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+        // ❌ 已移除：OpenAI API实现 - 成本较高（5积分/次）
+        // async function callOpenAIAPI(prompt, genre, sceneCount, config) {
+        //     const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+        //     
+        //     const response = await fetchWithTimeout(config.endpoint, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Authorization': `Bearer ${config.apiKey}`
+        //         },
+        //         body: JSON.stringify({
+        //             model: config.model,
+        //             messages: [{ role: "user", content: optimizedPrompt }],
+        //             temperature: 0.7
+        //         })
+        //     }, config.timeout);
+        //     
+        //     if (!response.ok) {
+        //         const errorText = await response.text();
+        //         throw { status: response.status, code: 'openai_error', message: errorText.substring(0, 200) };
+        //     }
+        //     
+        //     const data = await response.json();
+        //     return data.choices?.[0]?.message?.content || '';
+        // }
 
-            const response = await fetchWithTimeout(config.endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.apiKey}`
-                },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [{ role: "user", content: optimizedPrompt }],
-                    temperature: 0.7
-                })
-            }, config.timeout);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw { status: response.status, code: 'openai_error', message: errorText.substring(0, 200) };
-            }
-
-            const data = await response.json();
-            return data.choices?.[0]?.message?.content || '';
-        }
-
-        // Claude API
-        async function callClaudeAPI(prompt, genre, sceneCount, config) {
-            const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
-
-            const response = await fetchWithTimeout(config.endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': config.apiKey,
-                    'anthropic-version': '2023-06-01'
-                },
-                body: JSON.stringify({
-                    model: config.model,
-                    messages: [{ role: "user", content: optimizedPrompt }],
-                    max_tokens: 1024
-                })
-            }, config.timeout);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw { status: response.status, code: 'claude_error', message: errorText.substring(0, 200) };
-            }
-
-            const data = await response.json();
-            return data.content?.[0]?.text || '';
-        }
+        // ❌ 已移除：Claude API实现 - 成本较高（8积分/次）
+        // async function callClaudeAPI(prompt, genre, sceneCount, config) {
+        //     const optimizedPrompt = buildOptimizedPrompt(prompt, genre, sceneCount, false);
+        //     
+        //     const response = await fetchWithTimeout(config.endpoint, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'x-api-key': config.apiKey,
+        //             'anthropic-version': '2023-06-01'
+        //         },
+        //         body: JSON.stringify({
+        //             model: config.model,
+        //             messages: [{ role: "user", content: optimizedPrompt }],
+        //             max_tokens: 1024
+        //         })
+        //     }, config.timeout);
+        //     
+        //     if (!response.ok) {
+        //         const errorText = await response.text();
+        //         throw { status: response.status, code: 'claude_error', message: errorText.substring(0, 200) };
+        //     }
+        //     
+        //     const data = await response.json();
+        //     return data.content?.[0]?.text || '';
+        // }
+        
+        // ❌ 已移除：智谱AI API实现 - 成本过高（15积分/次）
+        // async function callZhipuAPI(prompt, genre, sceneCount, config) {
+        //     ...
+        // }
+        
+        // ❌ 已移除：通义千问 API实现 - 成本较高（3积分/次）
+        // async function callQwenAPI(prompt, genre, sceneCount, config) {
+        //     ...
+        // }
 
         // 智谱AI API
         async function callZhipuAPI(prompt, genre, sceneCount, config) {
