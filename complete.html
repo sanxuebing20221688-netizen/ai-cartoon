@@ -541,28 +541,28 @@
             <div class="section">
                 <h2>✨ 本周热门</h2>
                 <div class="featured-grid">
-                    <div class="featured-card" onclick="readComic('comic1')">
-                        <div class="featured-icon">💕</div>
-                        <div class="featured-title">命中注定遇见你</div>
-                        <div class="featured-meta">
-                            <span>⭐ 4.8</span>
-                            <span>👥 12.5K</span>
-                        </div>
-                    </div>
-                    <div class="featured-card" onclick="readComic('comic2')">
-                        <div class="featured-icon">🔍</div>
-                        <div class="featured-title">午夜图书馆</div>
+                    <div class="featured-card" onclick="readComic('story-001')">
+                        <div class="featured-cover" style="height: 140px; background-image: url('https://coze-coding-project.tos.coze.site/coze_storage_7614545905022271515/image/generate_image_5592f512-2a00-4fa9-8c81-ec27c844bdd6.jpeg?sign=1805432807-2b301f2a27-0-6ef27dca5c17b393409f2d6977f389a838491cbd7db519bcaf6b5f11dc881c9e'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+                        <div class="featured-title">水晶勇者的传说</div>
                         <div class="featured-meta">
                             <span>⭐ 4.9</span>
-                            <span>👥 8.9K</span>
+                            <span>👥 15.2K</span>
                         </div>
                     </div>
-                    <div class="featured-card" onclick="readComic('comic3')">
-                        <div class="featured-icon">🐉</div>
-                        <div class="featured-title">异世界转生记</div>
+                    <div class="featured-card" onclick="readComic('story-002')">
+                        <div class="featured-cover" style="height: 140px; background-image: url('https://coze-coding-project.tos.coze.site/coze_storage_7614545905022271515/image/generate_image_6d8e0aec-9700-45f1-8572-87f26625b0d8.jpeg?sign=1805432815-b49c53d3a2-0-8c83c17b5d8020c2181e3315ac08d7e321370d3aa959a9aed826bd1050f01ec8'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+                        <div class="featured-title">赛博少女2077</div>
                         <div class="featured-meta">
-                            <span>⭐ 4.7</span>
-                            <span>👥 15K</span>
+                            <span>⭐ 4.8</span>
+                            <span>👥 18.5K</span>
+                        </div>
+                    </div>
+                    <div class="featured-card" onclick="readComic('story-003')">
+                        <div class="featured-cover" style="height: 140px; background-image: url('https://coze-coding-project.tos.coze.site/coze_storage_7614545905022271515/image/generate_image_222fdfc0-552f-4eaa-bd27-0ab83692ee4f.jpeg?sign=1805432820-f4a9819cb2-0-bfaa061590353af8f32475356d314c85af74de8c01bc5359229191d531fe33b6'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+                        <div class="featured-title">剑影江湖</div>
+                        <div class="featured-meta">
+                            <span>⭐ 4.9</span>
+                            <span>👥 22.3K</span>
                         </div>
                     </div>
                 </div>
@@ -997,7 +997,70 @@
     </div>
 
     <script>
-        // 数据存储
+        // ===== 初始化和调试 =====
+        console.log('[AI漫画平台] 开始加载...');
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[AI漫画平台] DOM加载完成');
+            
+            // 初始化所有按钮事件
+            initButtons();
+            
+            // 初始化故事列表
+            if (document.getElementById('comicList')) {
+                renderComicList('all');
+            }
+            
+            console.log('[AI漫画平台] 初始化完成');
+        });
+        
+        // 初始化所有按钮
+        function initButtons() {
+            // 导航按钮
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    console.log('[按钮点击] 导航:', this.textContent);
+                    const pageId = this.getAttribute('onclick').match(/showPage\('([^']+)'\)/)?.[1];
+                    if (pageId) {
+                        e.preventDefault();
+                        showPage(pageId);
+                    }
+                });
+            });
+            
+            // 类型卡片
+            document.querySelectorAll('.genre-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    console.log('[按钮点击] 类型选择:', this.querySelector('.genre-name').textContent);
+                    const genre = this.querySelector('.genre-name').textContent;
+                    selectGenre(genre);
+                });
+            });
+            
+            // AI类型卡片
+            document.querySelectorAll('.ai-genre-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    console.log('[按钮点击] AI类型选择:', this.getAttribute('data-value'));
+                    selectAIGenre(this);
+                });
+            });
+            
+            // 过滤按钮
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    console.log('[按钮点击] 过滤:', this.textContent);
+                    const filter = this.textContent;
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderComicList('all');
+                });
+            });
+            
+            console.log('[AI漫画平台] 按钮事件初始化完成');
+        }
+        
+        // ===== 数据存储 =====
         let currentCharacter = {
             name: '',
             gender: '男',
@@ -1202,26 +1265,57 @@
             updatePreview();
         }
 
-        // 更新角色预览
+        // 更新角色预览（安全版本）
         function updatePreview() {
-            currentCharacter.name = document.getElementById('characterName').value || '未命名角色';
-            currentCharacter.gender = document.getElementById('characterGender').value;
-            currentCharacter.age = document.getElementById('characterAge').value;
-            currentCharacter.genre = document.getElementById('storyGenre').value;
-            currentCharacter.setting = document.getElementById('storySetting').value;
+            console.log('[updatePreview] 被调用');
+            
+            // 安全获取AI故事标题
+            const titleInput = document.getElementById('aiStoryTitle');
+            if (titleInput) {
+                currentCharacter.name = titleInput.value || '未命名故事';
+            }
+            
+            // 安全获取AI类型
+            currentCharacter.genre = document.getElementById('aiSelectedGenre')?.value || '';
+            
+            // AI创作不需要这些字段，但为了兼容性保留
+            const nameInput = document.getElementById('characterName');
+            if (nameInput) {
+                currentCharacter.name = nameInput.value || '未命名角色';
+            }
+            const genderInput = document.getElementById('characterGender');
+            if (genderInput) {
+                currentCharacter.gender = genderInput.value;
+            }
+            const ageInput = document.getElementById('characterAge');
+            if (ageInput) {
+                currentCharacter.age = ageInput.value;
+            }
+            
+            currentCharacter.setting = document.getElementById('storySetting')?.value || '';
 
-            document.getElementById('previewName').textContent = currentCharacter.name;
+            // 更新预览显示（如果存在）
+            const previewName = document.getElementById('previewName');
+            if (previewName) {
+                previewName.textContent = currentCharacter.name;
+            }
 
             let traits = [];
+            if (currentCharacter.genre) traits.push(currentCharacter.genre);
             if (currentCharacter.gender) traits.push(currentCharacter.gender);
             if (currentCharacter.age) traits.push(currentCharacter.age + '岁');
             if (currentCharacter.personality.length > 0) traits.push(currentCharacter.personality.join('、'));
 
-            document.getElementById('previewTraits').textContent = traits.join(' · ') || '请完善角色信息';
+            const previewTraits = document.getElementById('previewTraits');
+            if (previewTraits) {
+                previewTraits.textContent = traits.join(' · ') || '请完善角色信息';
+            }
 
-            // 更新头像
+            // 更新头像（如果存在）
             const avatar = document.querySelector('.character-avatar');
-            avatar.textContent = currentCharacter.gender === '女' ? '👩' : '👨';
+            if (avatar) {
+                avatar.textContent = currentCharacter.gender === '女' ? '👩' : '👨';
+            }
         }
 
         // 生成故事
