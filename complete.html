@@ -2866,11 +2866,12 @@ ${referenceHint}
         const COST_CONFIG = {
             // 单次调用成本（积分）
             costs: {
-                'doubao': 1,       // 豆包：1积分/次
+                'doubao': 1,       // 豆包：1积分/次 ✅ 唯一推荐
                 'openai': 5,       // OpenAI：5积分/次
-                'claude': 8,       // Claude：8积分/次
-                'zhipu': 15,      // 智谱AI：15积分/次（豆包的15倍）
-                'qwen': 3         // 通义千问：3积分/次（豆包的3倍）
+                'claude': 8       // Claude：8积分/次
+                // ❌ 已移除：智谱AI (GLM-4) - 成本是豆包的15倍
+                // ❌ 已移除：阿里通义千问 (Qwen) - 成本是豆包的3倍
+                // ❌ 已移除：minimax - 成本过高
             },
             // 成本阈值
             warningThreshold: 5,      // 警告阈值：5积分
